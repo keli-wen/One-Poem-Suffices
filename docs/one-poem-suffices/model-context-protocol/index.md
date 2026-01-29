@@ -30,7 +30,9 @@ MCP （Model Context Protocol，模型上下文协议）定义了应用程序和
 
 ![MCP的简单理解](./assets/mcp_simple_illustration.jpg)
 
-> 💡 为保证阅读的流畅性，本文将 MCP Host / Client / Server 的定义后置。初学者/用户可暂不关注这些概念，不影响对 MCP 的使用。
+!!! tip
+
+    💡 为保证阅读的流畅性，本文将 MCP Host / Client / Server 的定义后置。初学者/用户可暂不关注这些概念，不影响对 MCP 的使用。
 
 ## 2. Why MCP?
 
@@ -375,9 +377,11 @@ uv add "mcp[cli]" httpx
 touch txt_counter.py
 ```
 
-> **Question**: 什么是 `uv` 呢和 `conda` 比有什么区别？
-> 
-> **Answer**: 一个用 Rust 编写的超快速 (100x) Python 包管理器和环境管理工具，由 Astral 开发。定位为 pip 和 venv 的替代品，专注于速度、简单性和现代 Python 工作流。
+!!! question
+
+    **Question**: 什么是 `uv` 呢和 `conda` 比有什么区别？
+
+    **Answer**: 一个用 Rust 编写的超快速 (100x) Python 包管理器和环境管理工具，由 Astral 开发。定位为 pip 和 venv 的替代品，专注于速度、简单性和现代 Python 工作流。
 
 
 **Step3. 构造一个 prompt**
