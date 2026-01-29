@@ -13,7 +13,7 @@
 
 Anthropic 发现，多智能体系统性能比单智能体高出 **90.2%**。本文探讨从模型智能到系统智能的范式转移，回答 What / Why / How 三个核心问题。
 
-`⏱️ 45min` [阅读全文 →](./docs/multi-agent-system/)
+`⏱️ 45min` [阅读全文 →](./multi-agent-system/)
 
 ---
 
@@ -22,7 +22,7 @@ Anthropic 发现，多智能体系统性能比单智能体高出 **90.2%**。本
 
 上下文工程是构建工业级 AI Agent 的核心技能。本文深入分析这一概念的本质——它不是"高级的 Prompt Engineering"，而是一套在 Agentic System 发展中沉淀出的关键哲学与准则。
 
-`⏱️ 35min` [阅读全文 →](./docs/context-engineering/)
+`⏱️ 35min` [阅读全文 →](./context-engineering/)
 
 ---
 
@@ -31,7 +31,7 @@ Anthropic 发现，多智能体系统性能比单智能体高出 **90.2%**。本
 
 Context Engineering 的深入篇。探讨上下文工程中的关键范式转移，以及如何通过 Compress / Write / Isolate 实现高效的上下文管理。
 
-`⏱️ 35min` [阅读全文 →](./docs/just-in-time-context/)
+`⏱️ 35min` [阅读全文 →](./just-in-time-context/)
 
 ---
 
@@ -40,4 +40,4 @@ Context Engineering 的深入篇。探讨上下文工程中的关键范式转移
 
 从使用者角度出发，超越简单的文档翻译与技术细节。包含 MCP 的实际开发示例与应用实践。
 
-`⏱️ 20min 阅读 + 30min 实践` [阅读全文 →](./docs/model-context-protocol/)
+`⏱️ 20min 阅读 + 30min 实践` [阅读全文 →](./model-context-protocol/)

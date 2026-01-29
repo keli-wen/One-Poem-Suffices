@@ -1,0 +1,56 @@
+[project]
+site_name = "One Poem Suffices"
+site_url = "https://keli-wen.github.io/One-Poem-Suffices/"
+site_description = "一篇就够了 — Agent Engineering 深度思考与实践"
+site_author = "Keli Wen"
+
+repo_name = "keli-wen/One-Poem-Suffices"
+repo_url = "https://github.com/keli-wen/One-Poem-Suffices"
+
+copyright = "Copyright &copy; 2025 Keli Wen"
+
+nav = [
+    { "Home" = "index.md" },
+    { "Multi-Agent System" = "multi-agent-system/index.md" },
+    { "Context Engineering" = "context-engineering/index.md" },
+    { "Just-in-Time Context" = "just-in-time-context/index.md" },
+    { "Model Context Protocol" = "model-context-protocol/index.md" },
+]
+
+[project.theme]
+language = "zh"
+
+features = [
+    "navigation.instant",
+    "navigation.instant.prefetch",
+    "navigation.tracking",
+    "navigation.top",
+    "navigation.footer",
+    "navigation.indexes",
+    "search.suggest",
+    "search.highlight",
+    "content.code.copy",
+    "content.code.annotate",
+]
+
+[[project.theme.palette]]
+scheme = "default"
+primary = "indigo"
+accent = "indigo"
+toggle.icon = "material/brightness-7"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+scheme = "slate"
+primary = "indigo"
+accent = "indigo"
+toggle.icon = "material/brightness-4"
+toggle.name = "Switch to light mode"
+
+[project.theme.font]
+text = "Noto Sans SC"
+code = "JetBrains Mono"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/keli-wen"
