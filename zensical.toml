@@ -1,7 +1,7 @@
 [project]
 site_name = "One Poem Suffices"
 site_url = "https://keli-wen.github.io/One-Poem-Suffices/"
-site_description = "一篇就够了 — Agent Engineering 深度思考与实践"
+site_description = "Deep dives into Agent Engineering, Context Engineering, AI Coding, and beyond."
 site_author = "Keli Wen"
 
 repo_name = "keli-wen/One-Poem-Suffices"
@@ -21,7 +21,7 @@ nav = [
 ]
 
 [project.theme]
-language = "zh"
+language = "en"
 
 features = [
     "navigation.instant",
@@ -53,6 +53,12 @@ toggle.name = "Switch to light mode"
 [project.theme.font]
 text = "Noto Sans SC"
 code = "JetBrains Mono"
+
+[project.extra]
+alternate = [
+    { name = "English", link = "/One-Poem-Suffices/", lang = "en" },
+    { name = "中文", link = "/One-Poem-Suffices/zh/", lang = "zh" },
+]
 
 [[project.extra.social]]
 icon = "fontawesome/brands/github"

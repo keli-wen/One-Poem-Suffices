@@ -1,43 +1,48 @@
+---
+hide:
+  - toc
+---
+
 # One Poem Suffices
 
-这是博客系列《XXX：一篇就够了》。专注于 **Agent Engineering** 领域，分享关于 LLM / Agentic System 的深度思考与实践。
-
-水平有限，如果发现错误，欢迎指正！
+A blog series on **Agent Engineering** — deep dives into LLM and Agentic Systems. One article per topic, thorough enough that you only need to read it once.
 
 ---
 
-## 📚 博客目录
+### :material-robot: [Multi-Agent System](./multi-agent-system/)
 
-### 🤖 Multi-Agent System
-> *"当智能达到一定阈值，多智能体系统就成为扩展性能的重要方式。"*
+> *"When intelligence reaches a certain threshold, multi-agent systems become the key to scaling performance."*
 
-Anthropic 发现，多智能体系统性能比单智能体高出 **90.2%**。本文探讨从模型智能到系统智能的范式转移，回答 What / Why / How 三个核心问题。
+Anthropic found that multi-agent systems outperform single agents by **90.2%**. This article explores the paradigm shift from model intelligence to system intelligence, answering the core questions of What, Why, and How.
 
-`⏱️ 45min` [阅读全文 →](./multi-agent-system/)
-
----
-
-### 🧠 Context Engineering
-> *"多数 AI Agent 的失败，并非模型能力的失败，而是上下文工程的失败。"*
-
-上下文工程是构建工业级 AI Agent 的核心技能。本文深入分析这一概念的本质——它不是"高级的 Prompt Engineering"，而是一套在 Agentic System 发展中沉淀出的关键哲学与准则。
-
-`⏱️ 35min` [阅读全文 →](./context-engineering/)
+:octicons-clock-24: 45 min &nbsp; [:octicons-arrow-right-24: Read article](./multi-agent-system/)
 
 ---
 
-### ⚡ Just-in-Time Context
-> *"从 LLM 被动接收上下文，到 Agent 主动获取上下文。"*
+### :material-brain: [Context Engineering](./context-engineering/)
 
-Context Engineering 的深入篇。探讨上下文工程中的关键范式转移，以及如何通过 Compress / Write / Isolate 实现高效的上下文管理。
+> *"Most AI Agent failures are not failures of model capability, but failures of context engineering."*
 
-`⏱️ 35min` [阅读全文 →](./just-in-time-context/)
+Context Engineering is a core skill for building production-grade AI Agents. This article digs into its essence — not "advanced Prompt Engineering", but a set of principles distilled from the evolution of Agentic Systems.
+
+:octicons-clock-24: 35 min &nbsp; [:octicons-arrow-right-24: Read article](./context-engineering/)
 
 ---
 
-### 🔌 Model Context Protocol (MCP)
-> *"以一致的方式将各种数据源、工具和功能连接到 AI 模型。"*
+### :material-lightning-bolt: [Just-in-Time Context](./just-in-time-context/)
 
-从使用者角度出发，超越简单的文档翻译与技术细节。包含 MCP 的实际开发示例与应用实践。
+> *"From LLMs passively receiving context to Agents actively acquiring it."*
 
-`⏱️ 20min 阅读 + 30min 实践` [阅读全文 →](./model-context-protocol/)
+A deeper dive into Context Engineering. Explores the key paradigm shift and how to achieve efficient context management through Compress / Write / Isolate.
+
+:octicons-clock-24: 35 min &nbsp; [:octicons-arrow-right-24: Read article](./just-in-time-context/)
+
+---
+
+### :material-power-plug: [Model Context Protocol (MCP)](./model-context-protocol/)
+
+> *"Connect data sources, tools, and capabilities to AI models in a consistent way."*
+
+A practitioner's perspective that goes beyond simple doc translations. Includes hands-on MCP development examples and real-world applications.
+
+:octicons-clock-24: 20 min read + 30 min hands-on &nbsp; [:octicons-arrow-right-24: Read article](./model-context-protocol/)

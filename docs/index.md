@@ -1,17 +1,50 @@
-# 欢迎
+---
+hide:
+  - toc
+---
 
-这是我的个人博客站点，专注于 **Agent Engineering** 领域，分享关于 LLM / Agentic System 的深度思考与实践。
+# Welcome
 
-水平有限，如果发现错误，欢迎指正！
+A personal blog on AI — deep dives into Agent Engineering, Context Engineering, AI Coding, and beyond.
+
+Corrections and feedback are always welcome!
 
 ---
 
-## 📚 博客系列
+## Blog Series
 
-### [One Poem Suffices](./one-poem-suffices/)
+<div class="grid cards" markdown>
 
-《XXX：一篇就够了》— 每篇文章深入一个主题，力求一篇讲透。
+-   :material-book-open-variant:{ .lg .middle } __One Poem Suffices__
 
-目前涵盖 Multi-Agent System、Context Engineering、Just-in-Time Context、Model Context Protocol 等话题。
+    ---
 
-[查看系列 →](./one-poem-suffices/)
+    One article per topic, thorough enough that you only need to read it once. Covers Multi-Agent Systems, Context Engineering, MCP, and more.
+
+    [:octicons-arrow-right-24: Browse series](./one-poem-suffices/)
+
+-   :material-brain:{ .lg .middle } __Thinking in Context__
+
+    ---
+
+    A dedicated series on Context Engineering — exploring how to think about and build AI systems with context at the core.
+
+    :octicons-hourglass-24: Coming soon
+
+-   :material-code-braces:{ .lg .middle } __Zen of AI Coding__
+
+    ---
+
+    Thoughts and practices on AI-assisted coding.
+
+    :octicons-hourglass-24: Coming soon
+
+-   :material-trending-up:{ .lg .middle } __Scaling 一下__
+
+    ---
+
+    Casual notes and reflections on scaling — systems, ideas, and everything in between.
+
+    :octicons-hourglass-24: Coming soon
+
+</div>
