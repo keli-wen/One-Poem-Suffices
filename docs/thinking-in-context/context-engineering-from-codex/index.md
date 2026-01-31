@@ -6,7 +6,7 @@
 
 未来的 Context Engineering 一些随笔都会写到 “Thinking in Context” 系列中。
 
-先简单 recall 下之前的一些内容。在第一篇 [《Context Engineering，一篇就够了》](../../en/one-poem-suffices/context-engineering/) 中，我们定义了上下文工程的四个支柱：**Write、Select、Compress、Isolate**；在第二篇 [《Just-in-Time Context，一篇就够了》](../../en/one-poem-suffices/just-in-time-context/) 中，我们深入了 JIT Context 的摄入与代谢机制，探讨了 Agent 从被动接收上下文到主动获取上下文的范式转移。
+先简单 recall 下之前的一些内容。在第一篇 [《Context Engineering，一篇就够了》](../../one-poem-suffices/context-engineering/) 中，我们定义了上下文工程的四个支柱：**Write、Select、Compress、Isolate**；在第二篇 [《Just-in-Time Context，一篇就够了》](../../one-poem-suffices/just-in-time-context/) 中，我们深入了 JIT Context 的摄入与代谢机制，探讨了 Agent 从被动接收上下文到主动获取上下文的范式转移。
 
 OpenAI 近期发布的工程博客 [《Unrolling the Codex agent loop》](https://openai.com/index/unrolling-the-codex-agent-loop/) 为上下文工程提供了一个难得的分析样本。我个人用了相当长时间的 Codex CLI，虽然推理速度略慢，但在解决一些特别复杂的问题或者需求时能持续的执行很长的时间并最终交付一个良好的结果。因此，这是一个难得的机会从博客中窥见顶级公司是如何进行上下文工程的。
 
@@ -45,7 +45,7 @@ Codex 博客中详细展示了其 Prompt 的构建过程。当 Codex CLI 向 Res
 
 比如，在我们使用 Claude Code 或者 Codex CLI 时，我们会通过 shift + tab 切换审批模式，例如从“默认模式”切换到“自动修改”或者“规划模式”，或者我们进行了工作目录的切换（`cd /new/path`）。此时，如何让 agent 知道这些更新呢？朴素的做法是直接修改 Input 中对应的 `<environment_context>` / `<permissions instructions>` 消息内容，将 `cwd` 更新为新路径或者更新权限指令。这看起来最"干净"，上下文中始终反映最新状态，不存在冗余信息。
 
-但这种 **原地修改** 操作（Context Editing）会破坏前缀缓存。因为被修改的消息通常位于 Input 序列的中间位置，前缀从该位置开始就与缓存不再一致，后续所有 Token 的缓存全部失效。（这其实是一种 tradeoff，详情见我之前 JIT Context 博客中的 [Compress](../../en/one-poem-suffices/just-in-time-context/#3-effective-jit-context-engineering) 章节，**感觉 OpenAI 和 Anthropic 在这部分的处理上是两个不同的流派？**）
+但这种 **原地修改** 操作（Context Editing）会破坏前缀缓存。因为被修改的消息通常位于 Input 序列的中间位置，前缀从该位置开始就与缓存不再一致，后续所有 Token 的缓存全部失效。（这其实是一种 tradeoff，详情见我之前 JIT Context 博客中的 [Compress](../../one-poem-suffices/just-in-time-context/#3-effective-jit-context-engineering) 章节，**感觉 OpenAI 和 Anthropic 在这部分的处理上是两个不同的流派？**）
 
 Codex 选择了一种不同的策略：**Append-only（只追加，不修改）**。当环境状态发生变更时，Codex 保持所有已有消息不变，在历史记录的尾部追加一条新消息来记录变更：
 
@@ -67,7 +67,7 @@ Codex 选择了一种不同的策略：**Append-only（只追加，不修改）*
 
 !!! warning "一个值得思考的 Tradeoff"
 
-    Append-only 并非没有代价。事件日志的持续增长本身就会导致上下文膨胀，在之前的博客中我们提到过[上下文退化](../../en/one-poem-suffices/context-engineering/#31)的问题，上下文中冲突的内容或者噪声会对模型的性能产生影响。这就产生了一个内在的张力：**保留因果链的完整性** 与 **控制上下文的信噪比** 之间需要取舍。
+    Append-only 并非没有代价。事件日志的持续增长本身就会导致上下文膨胀，在之前的博客中我们提到过[上下文退化](../../one-poem-suffices/context-engineering/#31)的问题，上下文中冲突的内容或者噪声会对模型的性能产生影响。这就产生了一个内在的张力：**保留因果链的完整性** 与 **控制上下文的信噪比** 之间需要取舍。
 
     这里我觉得有两个不同的方向进行思考（一家之言）：
 
@@ -162,7 +162,7 @@ OpenAI 并未公开 `/responses/compact` 端点的内部实现。看到 "preserv
 
 - **模型绑定的风险**：如果你的 Agent 完全依赖 `/responses/compact` 来管理上下文，切换到 Anthropic 或开源模型时就失去了这个能力。应用层的 Semantic Compression（哪怕效果略差）提供了**跨厂商的可移植性**。
 - **可控性/可解释性问题**：厂商的压缩是黑盒，你无法控制哪些信息被保留、哪些被丢弃。对于特定业务场景中的关键约束（如"不要修改 core/ 目录"），应用层自己做的压缩可以通过 instruction 明确指定保留策略，厂商的通用压缩未必能识别这些领域特定的信号。
-- **递归压缩的信号衰减**：无论谁来做 Semantic Compression，多次递归压缩都会导致信号衰减（详见前作 [《Just-in-Time Context》中的 Compress 章节](../../en/one-poem-suffices/just-in-time-context/#3-effective-jit-context-engineering)）。这是文本层面有损压缩的根本性局限，厂商的信息优势可以缓解但无法消除。
+- **递归压缩的信号衰减**：无论谁来做 Semantic Compression，多次递归压缩都会导致信号衰减（详见前作 [《Just-in-Time Context》中的 Compress 章节](../../one-poem-suffices/just-in-time-context/#3-effective-jit-context-engineering)）。这是文本层面有损压缩的根本性局限，厂商的信息优势可以缓解但无法消除。
 
 最后补充我的一个观察：**Codex 目前是一个单 Agent Loop，没有 Isolation 机制**（[codex issue - Subagent Support](https://github.com/openai/codex/issues/2604))。 所有的探索、推理、工具调用都发生在同一个上下文窗口中，Context 的代谢完全依赖 `/responses/compact`。对比 Claude Code 的 Sub-agent 架构（通过 Task 工具派发子任务到独立上下文），这或许是 Codex 架构中一个值得关注的演进方向，当压缩不足以覆盖超长任务的上下文膨胀时，Isolation 可能是下一步。
 
@@ -195,6 +195,6 @@ OpenAI 并未公开 `/responses/compact` 端点的内部实现。看到 "preserv
 
 - [[1] OpenAI: Unrolling the Codex agent loop](https://openai.com/index/unrolling-the-codex-agent-loop/)
 - [[2] Anthropic: Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
-- [My Blog: Context Engineering，一篇就够了](../../en/one-poem-suffices/context-engineering/)
-- [My Blog: Just-in-Time Context，一篇就够了](../../en/one-poem-suffices/just-in-time-context/)
+- [My Blog: Context Engineering，一篇就够了](../../one-poem-suffices/context-engineering/)
+- [My Blog: Just-in-Time Context，一篇就够了](../../one-poem-suffices/just-in-time-context/)
 - [context-kit: GitHub Repository](https://github.com/keli-wen/context-kit)

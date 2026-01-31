@@ -13,10 +13,11 @@ nav = [
     { "首页" = "index.md" },
     { "One Poem Suffices" = [
         { "index" = "one-poem-suffices/index.md" },
-        { "Model Context Protocol" = "en/one-poem-suffices/model-context-protocol/index.md" },
-        { "Multi-Agent System" = "en/one-poem-suffices/multi-agent-system/index.md" },
-        { "Context Engineering" = "en/one-poem-suffices/context-engineering/index.md" },
-        { "Just-in-Time Context" = "en/one-poem-suffices/just-in-time-context/index.md" },
+        { "Prompt Caching" = "one-poem-suffices/prompt-caching/index.md" },
+        { "Model Context Protocol" = "one-poem-suffices/model-context-protocol/index.md" },
+        { "Multi-Agent System" = "one-poem-suffices/multi-agent-system/index.md" },
+        { "Context Engineering" = "one-poem-suffices/context-engineering/index.md" },
+        { "Just-in-Time Context" = "one-poem-suffices/just-in-time-context/index.md" },
     ]},
     { "Thinking in Context" = [
         { "index" = "thinking-in-context/index.md" },
