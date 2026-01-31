@@ -3,15 +3,13 @@ hide:
   - toc
 ---
 
-# Welcome
+# 欢迎
 
-A personal blog on AI — deep dives into Agent Engineering, Context Engineering, AI Coding, and beyond.
-
-Corrections and feedback are always welcome!
+这是我的个人博客站点，分享关于 AI 的深度思考与实践。水平有限，如果发现错误，欢迎指正！
 
 ---
 
-## Blog Series
+## 博客系列
 
 <div class="grid cards" markdown>
 
@@ -19,32 +17,32 @@ Corrections and feedback are always welcome!
 
     ---
 
-    One article per topic, thorough enough that you only need to read it once. Covers Multi-Agent Systems, Context Engineering, MCP, and more.
+    《一篇就够了》— 每篇文章深入一个主题，力求一篇讲透。涵盖 Multi-Agent System、Context Engineering、MCP 等话题。
 
-    [:octicons-arrow-right-24: Browse series](./one-poem-suffices/)
+    [:octicons-arrow-right-24: 查看系列](./one-poem-suffices/)
 
 -   :material-brain:{ .lg .middle } __Thinking in Context__
 
     ---
 
-    A dedicated series on Context Engineering — exploring how to think about and build AI systems with context at the core.
+    深入 Context Engineering 的专题系列。探索如何以上下文为核心来思考和构建 AI 系统。
 
-    :octicons-hourglass-24: Coming soon
+    [:octicons-arrow-right-24: 查看系列](./thinking-in-context/)
 
 -   :material-code-braces:{ .lg .middle } __Zen of AI Coding__
 
     ---
 
-    Thoughts and practices on AI-assisted coding.
+    关于 AI Coding 的思考与实践。
 
-    :octicons-hourglass-24: Coming soon
+    :octicons-hourglass-24: 即将推出
 
 -   :material-trending-up:{ .lg .middle } __Scaling 一下__
 
     ---
 
-    Casual notes and reflections on scaling — systems, ideas, and everything in between.
+    随笔式的思考笔记，聊聊 Scaling 相关的观察与感悟。
 
-    :octicons-hourglass-24: Coming soon
+    :octicons-hourglass-24: 即将推出
 
 </div>
