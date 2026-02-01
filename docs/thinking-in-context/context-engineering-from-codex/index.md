@@ -4,7 +4,7 @@
 
 `READ⏰: 18min`
 
-未来的 Context Engineering 一些随笔都会写到 “Thinking in Context” 系列中。
+未来的 Context Engineering 一些随笔都会写到 “Thinking in Context” 系列中（新的系列！）随便想了个名字，感觉挺不错的。因为《一篇就够了》系列给“作者”很大的压力，总会担心文章质量配不上标题，包括最近的 Agent Skills，其实一直想写但是总觉得自己还有地方没琢磨清楚。Thinking in Context 这种随笔式的系列可能更容易解放我的“写作生产力”把 哈哈 希望大家喜欢。
 
 先简单 recall 下之前的一些内容。在第一篇 [《Context Engineering，一篇就够了》](../../one-poem-suffices/context-engineering/) 中，我们定义了上下文工程的四个支柱：**Write、Select、Compress、Isolate**；在第二篇 [《Just-in-Time Context，一篇就够了》](../../one-poem-suffices/just-in-time-context/) 中，我们深入了 JIT Context 的摄入与代谢机制，探讨了 Agent 从被动接收上下文到主动获取上下文的范式转移。
 
@@ -29,14 +29,16 @@ Codex 博客中详细展示了其 Prompt 的构建过程。当 Codex CLI 向 Res
 
 为什么 Prompt 的组成架构需要专门拎出来描述一下呢？这主要和 Prompt Caching 相关，进一步思考是因为 Coding Agent 会面对相当多复杂的任务，上下文窗口的利用率较高。因此，Prompt Caching 无论在推理速度和成本控制上都举足轻重。
 
+![openai-prompt-caching-overview](./assets/openai-prompt-caching-overview.png)
+
 参考我的另一篇博客，Prompt Caching。Prompt Caching 的核心工作机制为：缓存命中要求**严格的前缀匹配**。只有当新请求的 Token 序列与缓存中的序列**从第一个 Token 开始完全一致**时，缓存才会生效。一旦前缀中的任何位置发生变动，哪怕只是调整了两个 Tool Definition 的顺序，后续所有 Token 的缓存都会失效，触发完整的重计算。
 
 因此，Codex 将**变化频率最低的内容置顶**（System Message、Tools、Instructions），将**变化频率最高的内容置底**（对话历史、Tool Traces）。这样，在 Agent Loop 的多轮迭代中，前缀部分始终保持不变，能够持续命中缓存。原文指出，这种策略使得 Codex 的采样成本从理论上的**二次增长降低为近似线性**。
 
 !!! tip "Codex 的工程教训"
 
-    Codex 团队在博客中提到，早期引入 MCP 工具支持时，由于未能保证工具枚举顺序的一致性，导致了 cache miss。MCP Server 还可以通过 `notifications/tools/list_changed` 通知动态更新工具列表，如果在长对话中途响应了这个通知，同样会破坏前缀，导致 Prompt Caching 失活。
-
+    Codex 团队在博客中提到，早期引入 MCP 工具支持时，由于未能保证工具枚举顺序的一致性，导致了 cache miss。MCP Server 还可以通过 [`notifications/tools/list_changed`](https://modelcontextprotocol.io/specification/2025-11-25/server/tools#list-changed-notification) 通知动态更新工具列表，如果在长对话中途响应了这个通知，同样会破坏前缀，导致 Prompt Caching 失活。
+    
     可以发现，在 Prompt Caching 体系下，**确定性是性能的前提**。任何引入非确定性的操作，无论多么微小都可能带来显著的性能回退。Prompt 的稳定性需要被视为一种**工程约束**来严格维护，而非一个可以随意调整的实现细节。这一点我们在接下来的章节马上会提到。
 
 ### 1.2 Immutable Context: Append-only 的状态管理
@@ -68,9 +70,9 @@ Codex 选择了一种不同的策略：**Append-only（只追加，不修改）*
 !!! warning "一个值得思考的 Tradeoff"
 
     Append-only 并非没有代价。事件日志的持续增长本身就会导致上下文膨胀，在之前的博客中我们提到过[上下文退化](../../one-poem-suffices/context-engineering/#31)的问题，上下文中冲突的内容或者噪声会对模型的性能产生影响。这就产生了一个内在的张力：**保留因果链的完整性** 与 **控制上下文的信噪比** 之间需要取舍。
-
+    
     这里我觉得有两个不同的方向进行思考（一家之言）：
-
+    
     1. OpenAI 对 Append-only 的 Context Engineering 进行了专门的模型训练，让它更适应这种形式从而不会 decrease 性能。对于上下文过长的问题，则通过优化过的 Context Compress 解决。
     2. Append-only 是更传统，且更容易在工程上实现的模式。相较于 Claude Code 更激进的 Context Editing 功能，OpenAI 在这方面更保守（更弱一些）。
 
@@ -146,10 +148,10 @@ OpenAI 并未公开 `/responses/compact` 端点的内部实现。看到 "preserv
 !!! example "类比：语义压缩的不对称"
 
     仅供直觉参考，不要过度引申：
-
+    
     - **应用层的压缩**相当于做总结笔记，你读完一本书，用自己的理解重写要点。笔记必然是原书的有损投影。
     - **厂商层的压缩**相当于"作者本人帮你做笔记"。他知道哪些段落是铺垫、哪些是核心论点、哪些伏笔后面会用到，所以他的笔记能保留更多关键结构。但本质上仍然是笔记，不是原书。
-
+    
     无论具体实现如何，**模型厂商能够利用应用开发者无法触及的内部信息来优化压缩**，这一结构性优势是确实存在的。
 
 ### 2.3 回到应用层：我们还能做什么？
