@@ -33,16 +33,16 @@ hide:
 
     ---
 
-    关于 AI Coding 的思考与实践。
+    AI Coding 的实践与思考。记录 Vibe Coding 中的经验、方法论与工作流，探讨 LLM 时代下工程师的核心能力。
 
-    :octicons-hourglass-24: 即将推出
+    [:octicons-arrow-right-24: 查看系列](./zen-of-ai-coding/)
 
 -   :material-trending-up:{ .lg .middle } __Scaling 一下__
 
     ---
 
-    随笔式的思考笔记，聊聊 Scaling 相关的观察与感悟。
+    随笔式的碎碎念，记录自己关于 AI、杠杆、个人成长的一些不成熟的想法。
 
-    :octicons-hourglass-24: 即将推出
+    [:octicons-arrow-right-24: 查看系列](./scaling-thoughts/)
 
 </div>

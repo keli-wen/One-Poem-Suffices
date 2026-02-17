@@ -23,6 +23,22 @@ nav = [
         { "index" = "thinking-in-context/index.md" },
         { "Codex 中的上下文工程" = "thinking-in-context/context-engineering-from-codex/index.md" },
     ]},
+    { "Zen of AI Coding" = [
+        { "index" = "zen-of-ai-coding/index.md" },
+        { "引子与问题划分" = "zen-of-ai-coding/intro/index.md" },
+        { "最佳实践 I" = "zen-of-ai-coding/best-practice-1/index.md" },
+    ]},
+    { "Scaling 一下" = [
+        { "index" = "scaling-thoughts/index.md" },
+        { "出租时间与为自己工作" = "scaling-thoughts/renting-time/index.md" },
+        { "当写代码成为基本能力" = "scaling-thoughts/coding-as-basic-skill/index.md" },
+        { "GenAI 时代的全栈开发" = "scaling-thoughts/genai-fullstack/index.md" },
+        { "把 LLM 当作你的私人秘书" = "scaling-thoughts/llm-as-secretary/index.md" },
+        { "月供 $125" = "scaling-thoughts/monthly-125-scaling/index.md" },
+        { "Seedance 2.0 的核扩散" = "scaling-thoughts/seedance-nuclear/index.md" },
+        { "2025 总结" = "scaling-thoughts/2025-review/index.md" },
+        { "当 Token 成为新的生产资料" = "scaling-thoughts/token-as-resource/index.md" },
+    ]},
 ]
 
 [project.theme]
