@@ -22,6 +22,7 @@ nav = [
     { "Thinking in Context" = [
         { "index" = "thinking-in-context/index.md" },
         { "Codex 中的上下文工程" = "thinking-in-context/context-engineering-from-codex/index.md" },
+        { "何时需要多智能体" = "thinking-in-context/when-multi-agent/index.md" },
     ]},
     { "Zen of AI Coding" = [
         { "index" = "zen-of-ai-coding/index.md" },
