@@ -12,12 +12,14 @@
 
 忽略该问题，可能把大量的精力投入低 ROI 的优化。Anthropic 在最新的博客 [《Building multi-agent systems: When and how to use them》](https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them) 中也坦言：
 
-> *"At Anthropic, we've seen teams invest months building elaborate multi-agent architectures only to discover that improved prompting on a single agent achieved equivalent results."*
-> 在 Anthropic，我们看到有些团队投入数月时间构建复杂的多智能体架构，结果却发现改进单智能体的提示词就能达到同等的效果。
+!!! example "Anthropic 的实践经验"
+
+    *"At Anthropic, we've seen teams invest months building elaborate multi-agent architectures only to discover that improved prompting on a single agent achieved equivalent results."*<br>
+    在 Anthropic，我们看到有些团队投入数月时间构建复杂的多智能体架构，结果却发现改进单智能体的提示词就能达到同等的效果。
 
 所以这一篇，我想认真想想 "When"。让我们 Thinking in Context，思考**何时使用多智能体架构？**
 
-- 在 [《Context Engineering，一篇就够了》](../../one-poem-suffices/context-engineering/) 中，我们定义了上下文工程的四个支柱：**Write、Select、Compress、Isolate**。
+- 在 [Context Engineering](../../one-poem-suffices/context-engineering/) 中，我们定义了上下文工程的四个支柱：**Write、Select、Compress、Isolate**。
 - 在 [JIT Context](../../one-poem-suffices/just-in-time-context/) 一篇中，我们主要深入了 Select 和 Compress/Write，而 Isolate 只是简单提及。本篇正是对 Isolate 的展开：当单个上下文空间的优化手段用尽时，何时需要扩展为多个？
 - 在上一篇 Thinking in Context 中，我们从 [Codex 的工程实践](../context-engineering-from-codex/) 出发，着眼于单个上下文空间内的工程实践（Prompt Cache 友好的上下文设计、Append-only 的状态管理）。
 
@@ -153,7 +155,7 @@ Coding Agent 更复杂，因为同一个项目内部存在**耦合度差异显�
 
 !!! warning "关于并行开发的陷阱"
 
-    一个容易想到的方案是：规定好 API Interface，让两个 Agent 分别开发前端和后端。理论上可行——如果接口在开发过程中始终不变。但实践中初始 Plan 几乎不可能完美，中途变更会导致频繁的上下文同步——而 1.2 节分析的信息衰减效应会在每一次同步中累积。**同步的难度与耦合度成正比。**人类公司中的传统开发走这个流程也一堆问题。
+    一个容易想到的方案是：规定好 API Interface，让两个 Agent 分别开发前端和后端。理论上可行——如果接口在开发过程中始终不变。但实践中初始 Plan 几乎不可能完美，中途变更会导致频繁的上下文同步——而 1.2 节分析的信息衰减效应会在每一次同步中累积。**同步的难度与耦合度成正比**。
 
 ### 3.3 是 Sub-agent 还是 Agentic Tool？
 
@@ -165,7 +167,7 @@ Coding Agent 更复杂，因为同一个项目内部存在**耦合度差异显�
 
 上面的分析可以归结为一个简洁的判断流程。
 
-**先穷尽单 Agent 的优化空间。** Prompt 是否足够清晰？是否做了上下文压缩？工具描述是否准确？是否使用了 [Tool-search-tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool) 进行工具集的优化。Anthropic 和 Cognition 在这一点上有共识：*"Start with the simplest approach that works."* 很多看似需要多智能体的问题，实际上是单 Agent 的上下文管理没有做好。
+**先穷尽单 Agent 的优化空间。** Prompt 是否足够清晰？是否做了上下文压缩？工具描述是否准确？是否使用了 [Tool-search-tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool) 进行工具集的优化。Anthropic 和 Cognition 在这一点上有共识：==*"Start with the simplest approach that works."*== 很多看似需要多智能体的问题，实际上是单 Agent 的上下文管理没有做好。
 
 **如果仍有瓶颈，识别信号。** 上下文窗口接近极限（表现为幻觉率上升、忽略早期指令）、工具集过大（频繁选错工具，并且工具集内有明显的专业领域区分）、需要覆盖大信息空间（搜索覆盖面不足），这些都是可能需要拆分的信号。
 
@@ -185,7 +187,8 @@ AI 的发展太快了，所以我认为**未来上下文耦合度一定不是唯
 
 最后用 Anthropic 的话收束。这句话从 2025 年的 [Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents) 到最新博客始终出现，我很喜欢它：
 
-> *"Start with the simplest approach that works, and add complexity only when evidence supports it."*
+!!! abstract "Slogan"
+    **"Start with the simplest approach that works, and add complexity only when evidence supports it."**
 
 ---
 
