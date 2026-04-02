@@ -29,13 +29,13 @@ hide:
 
     [:octicons-arrow-right-24: 查看系列](./thinking-in-context/)
 
--   :material-code-braces:{ .lg .middle } __Zen of AI Coding__
+-   :material-wrench:{ .lg .middle } __Zen of Harness Engineering__
 
     ---
 
-    AI Coding 的实践与思考。记录 Vibe Coding 中的经验、方法论与工作流，探讨 LLM 时代下工程师的核心能力。
+    曾经是氛围编程之禅。当 AI Coding 的本质变成设计约束让 Agent 干活，记录 Harness Engineering 的实战心得。
 
-    [:octicons-arrow-right-24: 查看系列](./zen-of-ai-coding/)
+    [:octicons-arrow-right-24: 查看系列](./zen-of-harness-engineering/)
 
 -   :material-trending-up:{ .lg .middle } __Scaling 一下__
 

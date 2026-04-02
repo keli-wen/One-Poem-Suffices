@@ -1,6 +1,6 @@
 ![Header](./assets/header.jpg)
 
-# Zen of AI Coding: 引子与问题划分
+# Zen of Harness Engineering: 引子与问题划分
 
 > 原文发布于 [知乎专栏](https://zhuanlan.zhihu.com/p/1903296419898556976)，2025-05-22
 

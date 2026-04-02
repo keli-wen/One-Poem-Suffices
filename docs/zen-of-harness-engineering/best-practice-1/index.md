@@ -1,4 +1,4 @@
-# Zen of AI Coding: 最佳实践 I
+# Zen of Harness Engineering: 最佳实践 I
 
 > 原文发布于 [知乎专栏](https://zhuanlan.zhihu.com/p/78314710899)，2025-10-20
 
@@ -70,7 +70,7 @@ AI Coding 发展到现在 bottleneck 不在于模型而是人类的 guidance 是
 
 ## 3. Project Level && Feature Level
 
-我很久之前把 Vibe Coding 划分为两类（参考上一次的 [Zen of AI Coding: 引子与问题划分](../intro/)，但具体内容可能过时了不少，那时候的 Coding Agent 能力远比不上如今）：
+我很久之前把 Vibe Coding 划分为两类（参考上一次的 [Zen of Harness Engineering: 引子与问题划分](../intro/)，但具体内容可能过时了不少，那时候的 Coding Agent 能力远比不上如今）：
 
 - **Project-Level**，整体项目相关的，涉及多个/复杂/耦合的问题。特点是需求比较模糊，可以继续细分与讨论，比如"设计具有某个功能的插件/应用"。
 - **Feature-Level**，具体功能相关的，涉及单个/少数/独立的问题。特点是需求比较清晰，可以参考大部分 GitHub 中的 issue，比如"修复某个因为 XX 导致的 bug"。

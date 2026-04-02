@@ -31,11 +31,11 @@ Corrections and feedback are always welcome!
 
     :octicons-hourglass-24: Coming soon
 
--   :material-code-braces:{ .lg .middle } __Zen of AI Coding__
+-   :material-wrench:{ .lg .middle } __Zen of Harness Engineering__
 
     ---
 
-    Thoughts and practices on AI-assisted coding.
+    What was once the Zen of Vibe Coding. Now that AI Coding is really about designing constraints for agents, documenting hands-on Harness Engineering practices.
 
     :octicons-hourglass-24: Coming soon
 

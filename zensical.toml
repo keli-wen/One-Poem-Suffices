@@ -24,10 +24,11 @@ nav = [
         { "Codex 中的上下文工程" = "thinking-in-context/context-engineering-from-codex/index.md" },
         { "何时需要多智能体" = "thinking-in-context/when-multi-agent/index.md" },
     ]},
-    { "Zen of AI Coding" = [
-        { "index" = "zen-of-ai-coding/index.md" },
-        { "引子与问题划分" = "zen-of-ai-coding/intro/index.md" },
-        { "最佳实践 I" = "zen-of-ai-coding/best-practice-1/index.md" },
+    { "Zen of Harness Engineering" = [
+        { "index" = "zen-of-harness-engineering/index.md" },
+        { "引子与问题划分" = "zen-of-harness-engineering/intro/index.md" },
+        { "最佳实践 I" = "zen-of-harness-engineering/best-practice-1/index.md" },
+        { "Claude Code 源码蒸馏" = "zen-of-harness-engineering/claudecode-distillation-practice/index.md" },
     ]},
     { "Scaling 一下" = [
         { "index" = "scaling-thoughts/index.md" },

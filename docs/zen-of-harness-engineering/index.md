@@ -3,9 +3,9 @@ hide:
   - toc
 ---
 
-# Zen of AI Coding
+# Zen of Harness Engineering
 
-AI Coding 的实践与思考。记录 Vibe Coding 中的经验、方法论与工作流，探讨 LLM 时代下工程师的核心能力。
+曾经是氛围编程之禅。当 AI Coding 的本质变成设计约束让 Agent 干活，记录 Harness Engineering 的实战心得。
 
 ---
 
@@ -26,3 +26,13 @@ AI Coding 的实践与思考。记录 Vibe Coding 中的经验、方法论与工
 分享从零开始 AI Coding 的实践：维护 Tech Context 构建技术复利、Talk to Design Docs 的自然语言编程范式、以及 Codex 与 Claude Code 的对比与协同。
 
 :octicons-clock-24: 15 min &nbsp; [:octicons-arrow-right-24: 阅读全文](./best-practice-1/)
+
+---
+
+### :material-flask-outline: [Claude Code 源码蒸馏 - Harness Engineering 实践记录](./claudecode-distillation-practice/)
+
+> *"代码是高维的，但有价值的设计模式其实是低秩的，蒸馏的本质就是找到这些主成分。"*
+
+从 51.2 万行 Claude Code 源码中蒸馏设计模式的完整实践记录：多 Agent 协作架构（Codex 审查 + Claude 执行）、品味注入的 PCA 类比、以及 7 轮 review 收敛的过程复盘。
+
+:octicons-clock-24: 25 min &nbsp; [:octicons-arrow-right-24: 阅读全文](./claudecode-distillation-practice/)
