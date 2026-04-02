@@ -85,6 +85,56 @@ async def prepare_page(page, url: str, viewport_w: int, viewport_h: int):
     await page.wait_for_timeout(500)
 
 
+async def get_unsplittable_elements(page):
+    """Get page-absolute bounding boxes of elements that shouldn't be split."""
+    return await page.evaluate("""() => {
+        const selectors = 'img, table, pre, .admonition, .highlight, h1, h2, h3, h4';
+        const elements = document.querySelectorAll(selectors);
+        return Array.from(elements).map(el => {
+            const rect = el.getBoundingClientRect();
+            const scrollY = window.scrollY;
+            return {
+                top: rect.top + scrollY,
+                bottom: rect.bottom + scrollY,
+            };
+        }).filter(e => (e.bottom - e.top) > 20 && (e.bottom - e.top) < 2000);
+    }""")
+
+
+def compute_smart_splits(total_height, viewport_h, overlap_vp, elements, padding=15):
+    """Compute scroll positions that avoid splitting important elements."""
+    step = viewport_h - overlap_vp
+
+    splits = [0]
+    current = 0
+
+    while current + viewport_h < total_height:
+        candidate = current + step
+
+        # Last page — scroll to show the bottom
+        if candidate + viewport_h >= total_height:
+            last = total_height - viewport_h
+            if last > current:
+                splits.append(max(0, last))
+            break
+
+        # Check if candidate cuts through any element, move up if so
+        adjusted = candidate
+        for elem in elements:
+            if elem["top"] - padding < candidate < elem["bottom"] + padding:
+                adjusted = elem["top"] - padding
+                break
+
+        # Ensure minimum forward progress (1/3 viewport)
+        if adjusted - current < viewport_h // 3:
+            adjusted = candidate
+
+        splits.append(adjusted)
+        current = adjusted
+
+    return splits
+
+
 async def export_screenshots(
     url: str,
     output_dir: str,
@@ -93,6 +143,7 @@ async def export_screenshots(
     dpr: int = DEFAULT_DPR,
     overlap_px: int = DEFAULT_OVERLAP,
     zoom: float = DEFAULT_ZOOM,
+    smart: bool = False,
 ):
     """Capture a blog page as sequential screenshots for 小红书."""
     from playwright.async_api import async_playwright
@@ -126,14 +177,24 @@ async def export_screenshots(
         print(f"     Page height: {total_height}px")
 
         print("[4/4] Capturing screenshots...")
-        step = viewport_h - overlap_vp
-        screenshots = []
-        page_num = 0
-        scroll_pos = 0
+        if smart:
+            elements = await get_unsplittable_elements(page)
+            splits = compute_smart_splits(total_height, viewport_h, overlap_vp, elements)
+            print(f"     Smart mode: {len(elements)} elements detected, {len(splits)} pages planned")
+        else:
+            step = viewport_h - overlap_vp
+            splits = []
+            pos = 0
+            while pos < total_height:
+                splits.append(pos)
+                pos += step
+                if pos + viewport_h >= total_height and pos < total_height:
+                    splits.append(max(0, total_height - viewport_h))
+                    break
 
-        while scroll_pos < total_height:
-            page_num += 1
-            await page.evaluate(f"window.scrollTo(0, {scroll_pos})")
+        screenshots = []
+        for page_num, scroll_pos in enumerate(splits, 1):
+            await page.evaluate(f"window.scrollTo(0, {int(scroll_pos)})")
             await page.wait_for_load_state("networkidle")
             await page.wait_for_timeout(500)
 
@@ -146,10 +207,6 @@ async def export_screenshots(
             file_size = os.path.getsize(filepath)
             print(f"     [{page_num}] scroll={actual_pos}px -> {filename} ({file_size // 1024}KB)")
             screenshots.append(filepath)
-
-            scroll_pos += step
-            if actual_pos + viewport_h >= total_height:
-                break
 
         print(f"\nDone! {len(screenshots)} screenshots -> {output_dir}/")
         await browser.close()
@@ -324,6 +381,7 @@ Examples:
     parser.add_argument("--dpr", type=int, default=DEFAULT_DPR, help=f"Device pixel ratio (default: {DEFAULT_DPR})")
     parser.add_argument("--overlap", type=int, default=DEFAULT_OVERLAP, help=f"Page overlap in px (default: {DEFAULT_OVERLAP})")
     parser.add_argument("--zoom", type=float, default=DEFAULT_ZOOM, help=f"CSS zoom (default: {DEFAULT_ZOOM})")
+    parser.add_argument("--smart", action="store_true", help="Smart splitting: avoid cutting images/tables/code blocks")
 
     args = parser.parse_args()
 
@@ -351,6 +409,7 @@ Examples:
             url=url, output_dir=output_dir,
             target_width=args.width, target_height=args.height,
             dpr=args.dpr, overlap_px=args.overlap, zoom=args.zoom,
+            smart=args.smart,
         ))
 
 
