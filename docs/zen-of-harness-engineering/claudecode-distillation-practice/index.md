@@ -1,20 +1,25 @@
 ![zen-of-harness-engineering](./assets/zen-of-harness-engineering.png)
 
-# Claude Code 源码蒸馏 - Harness Engineering 实践记录
+# 把 Claude Code 源码蒸馏成 Agent Skill — Harness Engineering 实践
 
 `READ⏰: 25min`
 
-突然发现，我"蒸馏" Claude Code 源码得到 Agent Harness Patterns Skill 的过程是一个不错的 Harness Engineering 的阅读材料～ （甚至可能比总结出的 skills 更有价值）所以总结下，也作为未来的 Harness Engineering 正式博客的补充材料吧。
+前段时间 Claude Code 源码泄露了，51.2 万行 TypeScript。看到消息后的第一反应是趁热把 harness 层的设计模式系统性地"蒸馏"一遍 — 这大概是目前能拿到的最成熟的生产级 Agent harness 实现。没想到有朝一日能让 Claude Code 蒸馏自己，热乎乎的代码变成冷冰冰的 Skill。
+
+最终产出的是一个可以直接 `npx skills add` 安装的 Agent Skill — [agentic-harness-patterns-skill](https://github.com/keli-wen/agentic-harness-patterns-skill)。它从 Claude Code 的实现中提炼了六个 harness 层的设计原则：覆盖了从 Agent 如何管理记忆和上下文，到多 Agent 如何协调分工，再到工具权限和生命周期如何设计。关注的是背后的 why 而非 Claude Code 的 how，以期可以直接迁移到其他 Agent 框架，或者用于指导个人一些 agent harness 开发与设计的最佳实践。
 
 ![agent-harness-patterns](./assets/agent-harness-patterns-header.png)
 
-距离 Claude Code 源码泄露大概过了几个小时，我就开始动手蒸馏了。动机其实很简单：这大概是目前能拿到的最成熟的生产级 Agent harness 实现，不趁热提炼一下总觉得可惜。至少我自己也比较好奇它内部的 context engineering 的设计。
-
-但 51.2 万行代码显然不是一个 Agent 在一个 session 里能处理的。所以蒸馏过程本身就变成了一次 Harness Engineering 的实践 — 我需要设计一套协调机制，让多个 Agent 高效协作完成这件事，同时让我自己的介入尽可能精确且最小化。我目前的设计原则基本源自我从以下几篇博客中汲取的一些 insights。
+但 51.2 万行代码显然不是一个 Agent 在一个 session 里能处理的。蒸馏过程本身就变成了一次 Harness Engineering 的实践 — 我设计了一套多 Agent 协调流程，让 Codex（GPT 5.4 xhigh）负责 review，Claude Code（Opus 4.6 max）负责执行，每轮 review & action 都在新 session 中进行，通过文件系统协调。我的设计原则主要来自几篇经典的 lab 博客：
 
 - [Anthropic - Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents)
 - [OpenAI - Harness engineering: leveraging Codex in an agent-first world](https://openai.com/index/harness-engineering/)
 - [OpenAI - How we used Codex to build Sora for Android in 28 days](https://openai.com/index/shipping-sora-for-android-with-codex/)
+
+如果让我总结这几篇博客传达的最有价值的 insights：
+
+- **Anthropic**，我个人觉得是：维护多 Agent 的 Role 并善于利用文件系统作为上下文。（A 社在多 Agent 领域理解很深～ 同时 FileSystem first 和 Just-in-Time Context 也是它的偏爱）
+- **OpenAI** 在 Codex 不断迭代的过程中逐步对齐了"文件系统作为上下文"的理念，另外一个比较有意思的是，OpenAI 的博客给我的感觉是在强调 Harness Engineering 需要注入人的品味（后文会提到）。
 
 回过头看，蒸馏的过程有点像做 PCA（主成分分析）式的降维。我通过注入自己的博客和偏好构建了一组"基向量"，然后让 Agent 从复杂的代码空间中做投影，提取出几个最主要的 principle。**代码是高维的，但有价值的设计模式其实是低秩的，我蒸馏的本质就是找到这些主成分**。（古老的数模记忆攻击了我）
 
@@ -22,16 +27,16 @@
 
 ## 1. Harness Design: Split by Role, Coordinate via Filesystem
 
-核心是将 review 与 execution 分离到两个不同的模型家族，且每轮 review-action 循环都在全新的 session 中进行。（这样做 design 的原因是我日常使用时感觉 codex GPT 5.4 xhigh 在 review 和 design 方面不会偷懒）
+核心是将 review 与 execution 分离到两个不同的模型家族，且每轮 review-action 循环都在全新的 session 中进行。（这样设计的原因是我日常使用时感觉 GPT 5.4 xhigh 在 review 和 design 方面不会偷懒）
 
 | 角色 | Agent | 职责 |
 |---|---|---|
-| 审查与架构 | Codex（GPT 5.4 xhigh） | 源码事实核验、定位决策、抽象层级判断、UX 审计 |
-| 构建与执行 | Claude Code（Opus 4.6 max） | 源码探索、参考文档起草、并行子 Agent 编排、编辑执行 |
+| 审查与架构 | Codex（GPT 5.4 xhigh） | 对照源码核查事实、判断方向和抽象层级、从用户视角审查可用性 |
+| 构建与执行 | Claude Code（Opus 4.6 max） | 阅读源码、起草参考文档、协调子 Agent 并行工作、执行修改 |
 
-至于为什么分开？和你不让实现者审查自己代码的逻辑一样。Codex 以全新视角对照源码审查；Claude Code 带着对先前决策的完整理解执行修改。两个 Agent 互不可见对方的 session。（Anthropic 在 [Building multi-agent systems: When and how to use them](https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them) 中也提到过类似思路：*One multi-agent pattern that consistently works well across domains is the **verification subagent**. This is a dedicated agent whose sole responsibility is testing or validating the main agent's work.*）
+至于为什么要分离 Agent Role？和你不让实现者审查自己代码的逻辑一样。Codex 以全新视角对照源码审查；Claude Code 带着对先前决策的完整理解执行修改。两个 Agent 互不可见对方的 session。（Anthropic 在 [Building multi-agent systems: When and how to use them](https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them) 中也提到过类似思路：*One multi-agent pattern that consistently works well across domains is the **verification subagent**. This is a dedicated agent whose sole responsibility is testing or validating the main agent's work.*）
 
-那它们靠什么协调？文件系统。通过文件名 + 简单的 Read Tool，低成本且不会丢信息。（这个设计可以参考 Anthropic 的 [How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) 中的原则：**Subagent output to a filesystem to minimize the 'game of telephone.'** 感兴趣的可以阅读： [Multi-Agent System，一篇就够了。](https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/multi-agent-system/)）
+那它们靠什么协调？文件系统。通过文件名 + 简单的 Read Tool，低成本且不会丢信息。（这个设计可以参考 Anthropic 的 [How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) 中的原则：**Subagent output to a filesystem to minimize the 'game of telephone.'** 感兴趣的可以阅读： [Multi-Agent System，一篇就够了。](https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/multi-agent-system/)）。由于是文档型任务而非 Coding 任务，顶层的编排（让两个 Agent 交互）还是由我来控制。
 
 在正式开工前，我让 Codex 一次性生成了整套 harness 基础设施。这套文件的设计目标是：让一个没有当前对话上下文的 clean agent 也能直接接手，知道去哪读、先做什么、做完写到哪里、怎么 review。
 
@@ -73,13 +78,13 @@ Handoff 文档是 Agent 之间的 API。每份 handoff 恰好包含下一个 Age
 
 - agent role
 - agent task handoff（task specific）（对于 codex 则是 progress-log.md 中的 diff）
-- repo filesystem（来自 openai 的博客，*We made repository knowledge the system of record, ... **give Codex a map, not a 1,000-page instruction manual.***）
+- repo filesystem（一些 insight 来自 openai 的博客，*We made repository knowledge the system of record, ... **give Codex a map, not a 1,000-page instruction manual.***）
 
 （这和 [JIT Context](https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/just-in-time-context/) 中的渐进式披露是同一个理念 — handoff 做的就是粗索引，让 Agent 只在需要时获得恰好足够的上下文。）
 
-这里的设计灵感就主要来自：[Anthropic - Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) **使用两个不同的 Agent**，在博客中是每个 coding agent 都会在新的空白 session 中选择一个 feature 进行实现。我这里则更进一步，利用 token usage scaling，让 reviewer（codex）和 executor （claude）**都**在新的 session 中进行，以期得到更好的结果（在设计良好的情况下，我的经验表明效果会很不错，并且可以 scaling 到相当规模的产品上）。
+这里的设计灵感就主要来自：[Anthropic - Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) **使用两个不同的 Agent**，在博客中是每个 coding agent 都会在新的空白 session 中选择一个 feature 进行实现。我这里则更进一步，让 reviewer（codex）和 executor（claude）**都**在新的 session 中进行，每轮都拿到完整的 token 预算，不会被前几轮的上下文污染 （token usage scaling），以期得到更好的结果（在设计良好的情况下，我的经验表明效果会很不错，并且可以 scaling 到相当规模的产品上）。
 
-再补充说明，由于是文档生成，所以 Harness 工程的好坏可能对效率的影响不明显（因为文本的 evaluation 比较难做），但在 coding 任务上好的 Harness 设计可以轻松的让 Agent 运行 30～60 分钟并得到非常高质量的产出。
+再补充说明，由于是文档生成，所以 Harness 工程的好坏可能对性能的影响不明显（因为文本的 evaluation 比较难做），但在 coding 任务上好的 Harness 设计可以轻松的让 Agent 运行 30～60 分钟并得到非常高质量的产出。
 
 ## 2. Human-in-the-Loop: Taste Injection
 
@@ -95,7 +100,7 @@ Handoff 文档是 Agent 之间的 API。每份 handoff 恰好包含下一个 Age
 
 因此，Agent 不是从零开始提取 **Agent 最佳实践** 的，它带着我对 select / write / compress / isolate Context Engineering 四轴框架的理解，带着我对 "Do the simple thing that works" 的偏好，以及我对抽象层级的判断标准。蒸馏出来的东西不是 Claude Code 源码的"客观映射"（最开始生成的都是这种），而是经过我的偏好基向量投影后的结果。
 
-回到 PCA 的类比：博客就是那组基向量。它们定义了"**什么方向是重要的**"，然后 Agent 沿着这些方向做投影。没有这些基向量，Agent 可能会提取出完全不同的主成分，也许更偏向实现细节，也许更偏向 API 设计，但不一定是我想要的 harness 设计原则。（最初提取的东西简直没眼看）
+回到 PCA 式降维的类比：博客就是那组基向量。它们定义了"**什么方向是重要的**"，然后 Agent 沿着这些方向做投影。没有这些基向量，Agent 可能会提取出完全不同的主成分，也许更偏向实现细节，也许更偏向 API 设计，但不一定是我想要的 harness 设计原则。（最初提取的东西简直没眼看）
 
 ![fig3-pca-projection](./assets/fig3-pca-projection.png)
 
@@ -165,13 +170,15 @@ Codex 第一轮 review 发现了 6 个事实错误（记忆系统未覆盖、并
 
 前面的章节已经覆盖了大部分具体的经验，这里只补充几点更一般性的思考。
 
-### 关于"客观"提取
+### 4.1 关于"客观"提取
 
-§2.1 讲了 PCA 类比，这里简单补充一点：一个**客观**的模式提取可能反而是最没用的，因为它没有视角，也就没有优先级（无法归约 agent action space）。好的蒸馏需要一个明确的立场，然后诚实地标注这个立场是什么（怎么感觉和 《Principle》里面的概念比较接近，推荐阅读 瑞·达利欧 的这本书，我最近也在基于这本书构建个人 Principle Skill 笑死）。
+§2.1 讲了 PCA 类比，这里简单补充一点：一个**客观**的模式提取可能反而是最没用的，因为它没有视角，也就没有优先级（无法归约 agent action space）。好的"蒸馏"需要一个明确的立场，然后诚实地标注这个立场是什么（怎么感觉和 《Principle》里面的概念比较接近，推荐阅读 瑞·达利欧 的这本书，我最近也在基于这本书构建个人 Principle Skill 笑死）。
 
-### 关于 Roadmap
+### 4.2 关于 Roadmap
 
-后续对 Codex CLI 和 Gemini CLI 的分析会用同一组基向量。如果一个模式在三套独立实现中都沿着同一个方向出现，它大概率反映的是问题域本身的结构，而不是某个团队的设计偏好（也不只是我的偏好）。这或许是最值得继续做的事情。
+后续对 Codex CLI 和 Gemini CLI 的分析会用同一组基向量。如果一个模式在三套独立实现中都沿着同一个方向出现，那它反映的大概率不是某个团队的设计偏好（也不只是我的偏好），而是构建 Agent 这件事本身的规律。这或许是最值得继续做的事情。
+
+最近停更很久，接下来可能会先尽力更新 Agent Skills 相关的博客～
 
 ## References
 
