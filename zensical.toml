@@ -40,6 +40,7 @@ nav = [
         { "Seedance 2.0 的核扩散" = "scaling-thoughts/seedance-nuclear/index.md" },
         { "2025 总结" = "scaling-thoughts/2025-review/index.md" },
         { "当 Token 成为新的生产资料" = "scaling-thoughts/token-as-resource/index.md" },
+        { "Demis Hassabis 访谈随想" = "scaling-thoughts/demis-three-quarters-agi/index.md" },
     ]},
 ]
 

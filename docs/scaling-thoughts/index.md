@@ -86,3 +86,13 @@ AIGC 视频生成对普通人的冲击、AI E2E 工作流的可能性、以及�
 AI Coding 投资心得、Claude 被封后的"戒断反应"、以及对 AI 时代个体价值与未来的思考。
 
 :octicons-clock-24: 10 min &nbsp; [:octicons-arrow-right-24: 阅读全文](./token-as-resource/)
+
+---
+
+### :material-telescope: [当 AI 成为理解世界的方式：Demis Hassabis 访谈随想](./demis-three-quarters-agi/)
+
+> *"Doing AI is like reading the language of the universe."*
+
+红杉 AI Ascent 2026 的 Demis Hassabis 访谈观感。记录四个让我心潮澎湃的点：AI for science 的元路径、learned simulator 解锁不可实验的复杂系统、信息作为更基础的视角、康德与斯宾诺莎与"阅读宇宙的语言"。
+
+:octicons-clock-24: 12 min &nbsp; [:octicons-arrow-right-24: 阅读全文](./demis-three-quarters-agi/)
