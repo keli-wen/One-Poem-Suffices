@@ -1,0 +1,105 @@
+<svg width="1280" height="860" viewBox="0 0 1280 860" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="860" rx="36" fill="#FFFFFF"/>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#8C846F"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="640" y="80" text-anchor="middle" fill="#1F1F1F" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="38" font-weight="760">A Unified Agent Architecture</text>
+  <text x="640" y="124" text-anchor="middle" fill="#68645E" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="19">由内向外：常驻的 context、按需的知识、外部的连接、隔离的执行。</text>
+
+  <!-- Rings: outer solid green = MCP boundary, inner dashed amber = on-demand knowledge -->
+  <circle cx="640" cy="480" r="280" stroke="#8DB36D" stroke-width="2.5"/>
+  <circle cx="640" cy="480" r="205" stroke="#D6A84F" stroke-width="2.5" stroke-dasharray="7 8"/>
+
+  <!-- Arrows under the chips/boxes -->
+  <g stroke="#8C846F" stroke-width="2.5" stroke-linecap="round">
+    <!-- MCP connect: inward -->
+    <path d="M478 318L572 412" marker-end="url(#arrow)"/>
+    <path d="M802 318L708 412" marker-end="url(#arrow)"/>
+    <path d="M478 642L568 552" marker-end="url(#arrow)"/>
+    <!-- Delegate: outward from the loop -->
+    <path d="M520 458H336" marker-end="url(#arrow)"/>
+    <path d="M760 458H944" marker-end="url(#arrow)"/>
+  </g>
+  <!-- Results only: thin return -->
+  <g stroke="#8C846F" stroke-width="1.8" stroke-linecap="round">
+    <path d="M330 502H506" marker-end="url(#arrow)"/>
+    <path d="M950 502H774" marker-end="url(#arrow)"/>
+  </g>
+  <!-- Skill loads: dashed = on-demand -->
+  <g stroke="#8C846F" stroke-width="2.5" stroke-dasharray="7 8" stroke-linecap="round">
+    <path d="M492 400L528 414" marker-end="url(#arrow)"/>
+    <path d="M788 400L752 414" marker-end="url(#arrow)"/>
+    <path d="M640 656V548" marker-end="url(#arrow)"/>
+    <path d="M1055 440C1000 398 940 386 862 388" marker-end="url(#arrow)"/>
+  </g>
+
+  <g font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <!-- Ring badges, masking the ring lines -->
+    <rect x="567" y="182" width="146" height="36" rx="18" fill="#F2F7EA" stroke="#8DB36D" stroke-width="2"/>
+    <text x="640" y="206" text-anchor="middle" fill="#3E5A2A" font-size="17" font-weight="760">MCP Servers</text>
+    <rect x="562" y="257" width="156" height="36" rx="18" fill="#FFF6DD" stroke="#D6A84F" stroke-width="2"/>
+    <text x="640" y="281" text-anchor="middle" fill="#66502B" font-size="17" font-weight="760">Skills Library</text>
+
+    <!-- MCP chips with logo marks -->
+    <rect x="382" y="260" width="120" height="44" rx="22" fill="#FFFFFF" stroke="#8DB36D" stroke-width="2"/>
+    <g transform="translate(398 272) scale(1.5)" fill="#24292F">
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+    </g>
+    <text x="430" y="288" fill="#24292F" font-size="16" font-weight="720">GitHub</text>
+
+    <rect x="798" y="260" width="80" height="44" rx="22" fill="#FFFFFF" stroke="#8DB36D" stroke-width="2"/>
+    <g stroke="#3E5A2A" stroke-width="2" fill="none">
+      <ellipse cx="825" cy="273" rx="11" ry="4.5"/>
+      <path d="M814 273v14c0 2.5 4.9 4.5 11 4.5s11-2 11-4.5v-14"/>
+    </g>
+    <text x="842" y="288" fill="#3E5A2A" font-size="16" font-weight="720">DB</text>
+
+    <rect x="382" y="656" width="120" height="44" rx="22" fill="#FFFFFF" stroke="#8DB36D" stroke-width="2"/>
+    <rect x="398" y="667" width="22" height="22" rx="5" fill="#FFFFFF" stroke="#1F1F1F" stroke-width="2"/>
+    <text x="409" y="684" text-anchor="middle" fill="#1F1F1F" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="700">N</text>
+    <text x="428" y="684" fill="#1F1F1F" font-size="16" font-weight="720">Notion</text>
+
+    <!-- Skill folders on the inner ring -->
+    <g font-size="13" font-weight="730">
+      <path d="M430 354h22l8 8h34v38h-64z" fill="#FFF6DD" stroke="#D6A84F" stroke-width="2" stroke-linejoin="round"/>
+      <text x="462" y="386" text-anchor="middle" fill="#66502B">Skill</text>
+      <path d="M786 354h22l8 8h34v38h-64z" fill="#FFF6DD" stroke="#D6A84F" stroke-width="2" stroke-linejoin="round"/>
+      <text x="818" y="386" text-anchor="middle" fill="#66502B">Skill</text>
+      <path d="M608 662h22l8 8h34v38h-64z" fill="#FFF6DD" stroke="#D6A84F" stroke-width="2" stroke-linejoin="round"/>
+      <text x="640" y="694" text-anchor="middle" fill="#66502B">Skill</text>
+    </g>
+
+    <!-- Agent Loop -->
+    <rect x="520" y="420" width="240" height="120" rx="14" fill="#FFFFFF" stroke="#3A362F" stroke-width="2"/>
+    <text x="640" y="450" text-anchor="middle" fill="#1F1F1F" font-size="20" font-weight="760">Agent Loop</text>
+    <rect x="541" y="462" width="76" height="30" rx="15" fill="#E8F3FF" stroke="#5A9FD6" stroke-width="2"/>
+    <text x="579" y="482" text-anchor="middle" fill="#254A66" font-size="14" font-weight="720">Prompt</text>
+    <rect x="627" y="462" width="112" height="30" rx="15" fill="#E8F3FF" stroke="#5A9FD6" stroke-width="2"/>
+    <text x="683" y="482" text-anchor="middle" fill="#254A66" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="720">CLAUDE.md</text>
+    <text x="640" y="522" text-anchor="middle" fill="#68645E" font-size="13">模型推理与决策</text>
+
+    <!-- Subagents -->
+    <rect x="130" y="444" width="190" height="72" rx="15" fill="#F6F2EA" stroke="#8D867B" stroke-width="2"/>
+    <text x="225" y="474" text-anchor="middle" fill="#3A362F" font-size="17" font-weight="750">Subagent</text>
+    <text x="225" y="498" text-anchor="middle" fill="#68645E" font-size="13">隔离的 context 与工具</text>
+    <rect x="960" y="444" width="190" height="72" rx="15" fill="#F6F2EA" stroke="#8D867B" stroke-width="2"/>
+    <text x="1055" y="474" text-anchor="middle" fill="#3A362F" font-size="17" font-weight="750">Subagent</text>
+    <text x="1055" y="498" text-anchor="middle" fill="#68645E" font-size="13">隔离的 context 与工具</text>
+
+    <!-- Arrow labels -->
+    <text x="400" y="446" fill="#56514A" font-size="13" font-weight="720">委派</text>
+    <text x="372" y="524" fill="#68645E" font-size="13">只取回结论</text>
+    <text x="852" y="446" fill="#56514A" font-size="13" font-weight="720">委派</text>
+    <text x="778" y="524" fill="#68645E" font-size="13">只取回结论</text>
+    <text x="656" y="612" fill="#8A8378" font-size="13">语义命中才加载</text>
+    <text x="920" y="355" fill="#8A8378" font-size="13">也可加载 Skill</text>
+
+    <!-- Footnote -->
+    <text x="640" y="800" text-anchor="middle" fill="#5F5A52" font-size="18">Prompt 常驻 · Skill 按需 · MCP 连接 · Subagent 隔离</text>
+  </g>
+</svg>

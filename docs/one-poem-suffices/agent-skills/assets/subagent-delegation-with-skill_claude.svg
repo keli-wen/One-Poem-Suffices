@@ -1,0 +1,129 @@
+<svg width="1280" height="844" viewBox="0 0 1280 844" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="844" rx="36" fill="#F7F4EF"/>
+  <rect x="42" y="42" width="1196" height="760" rx="28" fill="#FFFDF8" stroke="#D8D1C7" stroke-width="2"/>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#8C846F"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="86" y="102" fill="#1F1F1F" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="38" font-weight="760">Subagent + Skill 委派</text>
+  <text x="88" y="142" fill="#68645E" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="19">同类任务反复派生 subagent：handoff 要么每次重新拼装，要么沉淀成 Skill，语义命中才加载。</text>
+
+  <!-- Panels: same treatment both sides, so the contrast comes from the contents -->
+  <rect x="84" y="176" width="540" height="554" rx="24" fill="#FAF8F2" stroke="#8D867B" stroke-width="2"/>
+  <rect x="656" y="176" width="540" height="554" rx="24" fill="#FAF8F2" stroke="#8D867B" stroke-width="2"/>
+
+  <g font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <!-- Panel headers -->
+    <rect x="112" y="196" width="158" height="40" rx="20" fill="#F8E7DC" stroke="#C97B5A" stroke-width="2"/>
+    <text x="191" y="222" text-anchor="middle" fill="#8A4A2E" font-size="18" font-weight="760">Without Skill</text>
+    <text x="286" y="222" fill="#8A8378" font-size="15">每次 delegation 重新拼装上下文</text>
+
+    <rect x="684" y="196" width="128" height="40" rx="20" fill="#F2F7EA" stroke="#8DB36D" stroke-width="2"/>
+    <text x="748" y="222" text-anchor="middle" fill="#3E5A2A" font-size="18" font-weight="760">With Skill</text>
+    <text x="828" y="222" fill="#8A8378" font-size="15">handoff 只带 task 和 skill name</text>
+
+    <!-- Orchestrators: darker stroke so the main agent reads as the anchor of each panel -->
+    <rect x="134" y="262" width="440" height="56" rx="15" fill="#FFFFFF" stroke="#3A362F" stroke-width="2"/>
+    <text x="354" y="297" text-anchor="middle" fill="#1F1F1F" font-size="19" font-weight="760">Orchestrator / 主 Agent</text>
+    <rect x="706" y="262" width="440" height="56" rx="15" fill="#FFFFFF" stroke="#3A362F" stroke-width="2"/>
+    <text x="926" y="297" text-anchor="middle" fill="#1F1F1F" font-size="19" font-weight="760">Orchestrator / 主 Agent</text>
+
+    <!-- Left: three fat handoff bundles, identical except the task line -->
+    <g font-size="13.5">
+      <rect x="112" y="348" width="148" height="136" rx="12" fill="#FFF6DD" stroke="#D6A84F" stroke-width="2"/>
+      <text x="128" y="378" fill="#3E5A2A" font-size="14" font-weight="760">task A</text>
+      <path d="M128 392H244" stroke="#EAD9AE" stroke-width="2"/>
+      <text x="128" y="420" fill="#6F6148">领域知识</text>
+      <text x="128" y="447" fill="#6F6148">工具用法</text>
+      <text x="128" y="474" fill="#6F6148">流程规范</text>
+
+      <rect x="280" y="348" width="148" height="136" rx="12" fill="#FFF6DD" stroke="#D6A84F" stroke-width="2"/>
+      <text x="296" y="378" fill="#3E5A2A" font-size="14" font-weight="760">task B</text>
+      <path d="M296 392H412" stroke="#EAD9AE" stroke-width="2"/>
+      <text x="296" y="420" fill="#6F6148">领域知识</text>
+      <text x="296" y="447" fill="#6F6148">工具用法</text>
+      <text x="296" y="474" fill="#6F6148">流程规范</text>
+
+      <rect x="448" y="348" width="148" height="136" rx="12" fill="#FFF6DD" stroke="#D6A84F" stroke-width="2"/>
+      <text x="464" y="378" fill="#3E5A2A" font-size="14" font-weight="760">task C</text>
+      <path d="M464 392H580" stroke="#EAD9AE" stroke-width="2"/>
+      <text x="464" y="420" fill="#6F6148">领域知识</text>
+      <text x="464" y="447" fill="#6F6148">工具用法</text>
+      <text x="464" y="474" fill="#6F6148">流程规范</text>
+    </g>
+
+    <!-- Subagents: identical boxes on both sides, same baseline -->
+    <rect x="112" y="518" width="148" height="56" rx="15" fill="#F6F2EA" stroke="#8D867B" stroke-width="2"/>
+    <text x="186" y="553" text-anchor="middle" fill="#3A362F" font-size="16" font-weight="750">Subagent A</text>
+    <rect x="280" y="518" width="148" height="56" rx="15" fill="#F6F2EA" stroke="#8D867B" stroke-width="2"/>
+    <text x="354" y="553" text-anchor="middle" fill="#3A362F" font-size="16" font-weight="750">Subagent B</text>
+    <rect x="448" y="518" width="148" height="56" rx="15" fill="#F6F2EA" stroke="#8D867B" stroke-width="2"/>
+    <text x="522" y="553" text-anchor="middle" fill="#3A362F" font-size="16" font-weight="750">Subagent C</text>
+
+    <rect x="684" y="518" width="148" height="56" rx="15" fill="#F6F2EA" stroke="#8D867B" stroke-width="2"/>
+    <text x="758" y="553" text-anchor="middle" fill="#3A362F" font-size="16" font-weight="750">Subagent A</text>
+    <rect x="852" y="518" width="148" height="56" rx="15" fill="#F6F2EA" stroke="#8D867B" stroke-width="2"/>
+    <text x="926" y="553" text-anchor="middle" fill="#3A362F" font-size="16" font-weight="750">Subagent B</text>
+    <rect x="1020" y="518" width="148" height="56" rx="15" fill="#F6F2EA" stroke="#8D867B" stroke-width="2"/>
+    <text x="1094" y="553" text-anchor="middle" fill="#3A362F" font-size="16" font-weight="750">Subagent C</text>
+
+    <!-- Left bottom: absence marker, positionally mirrors the Skills Library -->
+    <rect x="112" y="610" width="484" height="104" rx="15" stroke="#C9C1B4" stroke-width="2" stroke-dasharray="6 7"/>
+    <text x="354" y="654" text-anchor="middle" fill="#8A8378" font-size="15" font-weight="740">没有共享知识库</text>
+    <text x="354" y="682" text-anchor="middle" fill="#9A9388" font-size="14">同一套知识，复制了三份</text>
+
+    <!-- Right bottom: the same amber knowledge, stored once -->
+    <rect x="684" y="610" width="484" height="104" rx="15" fill="#FFF6DD" stroke="#D6A84F" stroke-width="2"/>
+    <text x="926" y="646" text-anchor="middle" fill="#66502B" font-size="18" font-weight="760">Skills Library</text>
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12">
+      <rect x="695" y="660" width="126" height="28" rx="14" fill="#FFFFFF" stroke="#D6A84F" stroke-width="2"/>
+      <text x="758" y="679" text-anchor="middle" fill="#725420">security-review</text>
+      <rect x="867" y="660" width="118" height="28" rx="14" fill="#FFFFFF" stroke="#D6A84F" stroke-width="2"/>
+      <text x="926" y="679" text-anchor="middle" fill="#725420">data-pipeline</text>
+      <rect x="1042" y="660" width="104" height="28" rx="14" fill="#FFFFFF" stroke="#D6A84F" stroke-width="2"/>
+      <text x="1094" y="679" text-anchor="middle" fill="#725420">code-review</text>
+    </g>
+    <text x="940" y="601" fill="#8A8378" font-size="13">语义命中才加载</text>
+
+    <!-- Footnote -->
+    <text x="86" y="770" fill="#5F5A52" font-size="18">同样三次委派：左边把同一套知识讲了三遍，右边知识只存一份，subagent 语义命中才加载。</text>
+  </g>
+
+  <!-- Left flow: orchestrator → bundle → subagent -->
+  <g stroke="#8C846F" stroke-width="2.5" stroke-linecap="round">
+    <path d="M186 322V342" marker-end="url(#arrow)"/>
+    <path d="M354 322V342" marker-end="url(#arrow)"/>
+    <path d="M522 322V342" marker-end="url(#arrow)"/>
+    <path d="M186 488V512" marker-end="url(#arrow)"/>
+    <path d="M354 488V512" marker-end="url(#arrow)"/>
+    <path d="M522 488V512" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- Right flow: one long thin arrow per delegation -->
+  <g stroke="#8C846F" stroke-width="2.5" stroke-linecap="round">
+    <path d="M758 322V512" marker-end="url(#arrow)"/>
+    <path d="M926 322V512" marker-end="url(#arrow)"/>
+    <path d="M1094 322V512" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- Thin handoff pills, drawn on top of the long arrows -->
+  <g font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <rect x="683" y="403" width="150" height="28" rx="14" fill="#FFFFFF" stroke="#8DB36D" stroke-width="2"/>
+    <text x="758" y="422" text-anchor="middle" fill="#48652F" font-size="13" font-weight="720">task A + skill name</text>
+    <rect x="851" y="403" width="150" height="28" rx="14" fill="#FFFFFF" stroke="#8DB36D" stroke-width="2"/>
+    <text x="926" y="422" text-anchor="middle" fill="#48652F" font-size="13" font-weight="720">task B + skill name</text>
+    <rect x="1019" y="403" width="150" height="28" rx="14" fill="#FFFFFF" stroke="#8DB36D" stroke-width="2"/>
+    <text x="1094" y="422" text-anchor="middle" fill="#48652F" font-size="13" font-weight="720">task C + skill name</text>
+  </g>
+
+  <!-- Dashed pull arrows: knowledge flows up from the library on demand -->
+  <g stroke="#8C846F" stroke-width="2.5" stroke-dasharray="7 8" stroke-linecap="round">
+    <path d="M758 606V584" marker-end="url(#arrow)"/>
+    <path d="M926 606V584" marker-end="url(#arrow)"/>
+    <path d="M1094 606V584" marker-end="url(#arrow)"/>
+  </g>
+</svg>

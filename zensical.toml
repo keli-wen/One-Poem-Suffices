@@ -18,6 +18,7 @@ nav = [
         { "Multi-Agent System" = "one-poem-suffices/multi-agent-system/index.md" },
         { "Context Engineering" = "one-poem-suffices/context-engineering/index.md" },
         { "Just-in-Time Context" = "one-poem-suffices/just-in-time-context/index.md" },
+        { "Agent Skills" = "one-poem-suffices/agent-skills/index.md" },
     ]},
     { "Thinking in Context" = [
         { "index" = "thinking-in-context/index.md" },

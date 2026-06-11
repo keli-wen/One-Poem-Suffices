@@ -56,3 +56,13 @@ Anthropic 发现，多智能体系统性能比单智能体高出 **90.2%**。本
 Context Engineering 的深入篇。探讨上下文工程中的关键范式转移，以及如何通过 Compress / Write / Isolate 实现高效的上下文管理。
 
 :octicons-clock-24: 35 min &nbsp; [:octicons-arrow-right-24: 阅读全文](./just-in-time-context/)
+
+---
+
+### :material-toolbox: [Agent Skills](./agent-skills/)
+
+> *"Skills 本质是 Context，取用方式是 Just-in-Time。"*
+
+为什么一个"文件夹 + Markdown"的简单格式会成为 Agent 生态的新标准？本文从 Context 与 JIT 两个视角解构 Skills 的本质，对比 Prompt / MCP / Subagent / Memory，并分享构建好 Skill 的最佳实践与真实案例。
+
+:octicons-clock-24: 50 min &nbsp; [:octicons-arrow-right-24: 阅读全文](./agent-skills/)

@@ -1,0 +1,130 @@
+<svg width="1300" height="760" viewBox="0 0 1300 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1300" height="760" rx="36" fill="#F7F4EF"/>
+  <rect x="42" y="42" width="1216" height="676" rx="28" fill="#FFFDF8" stroke="#D8D1C7" stroke-width="2"/>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#8C846F"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="86" y="92" fill="#1F1F1F" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="34" font-weight="760"><tspan font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace">auto-memory</tspan> 机制：后台写，按需读</text>
+  <text x="86" y="128" fill="#68645E" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="19">上半为写入：后台 subagent 周期性提取沉淀；下半为读取：旁路小模型代选注入。两条管线都先扫 header，命中才读全文。</text>
+
+  <g font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <!-- ===== Top lane: write pipeline (automatic) ===== -->
+    <text x="86" y="156" fill="#8A8378" font-size="15" font-weight="720">写入管线 · 全自动</text>
+
+    <!-- W1: main session -->
+    <rect x="86" y="164" width="184" height="110" rx="15" fill="#E8F3FF" stroke="#5A9FD6" stroke-width="2"/>
+    <text x="108" y="202" fill="#254A66" font-size="19" font-weight="760">主对话 session</text>
+    <text x="108" y="228" fill="#445D70" font-size="13.5">主上下文正常干活</text>
+
+    <!-- W2: trigger (decision-style white node) -->
+    <rect x="300" y="164" width="240" height="110" rx="26" fill="#FFFFFF" stroke="#8D867B" stroke-width="2"/>
+    <text x="324" y="202" fill="#3A362F" font-size="19" font-weight="760">达到阈值设置</text>
+    <text x="324" y="228" fill="#68645E" font-size="13.5">默认：每轮对话后触发</text>
+    <text x="324" y="250" fill="#8A8378" font-size="13">trigger / threshold</text>
+
+    <!-- W3: background subagent -->
+    <rect x="570" y="164" width="300" height="110" rx="15" fill="#F2F7EA" stroke="#8DB36D" stroke-width="2"/>
+    <text x="594" y="202" fill="#3E5A2A" font-size="19" font-weight="760">后台 fork 的 subagent</text>
+    <text x="594" y="228" fill="#526445" font-size="13.5">继承主模型 · 共享 prompt cache</text>
+    <text x="594" y="250" fill="#526445" font-size="13.5">分析最近一轮对话 · 不打断主对话</text>
+
+    <!-- W4: compare against existing memory (decision) -->
+    <rect x="900" y="164" width="314" height="110" rx="26" fill="#FFFFFF" stroke="#8D867B" stroke-width="2"/>
+    <text x="924" y="202" fill="#3A362F" font-size="19" font-weight="760">与已有记忆比对</text>
+    <text x="924" y="228" fill="#68645E" font-size="13.5">先扫条目 header：新建还是更新？</text>
+    <text x="924" y="250" fill="#68645E" font-size="13.5">需更新才读取完整条目</text>
+
+    <!-- Note on the write-down arrow -->
+    <text x="1072" y="298" fill="#56514A" font-size="13">新建 / Upsert / 删除</text>
+
+    <!-- ===== Middle: storage area ===== -->
+    <rect x="86" y="312" width="1128" height="182" rx="20" fill="#FFF6DD" stroke="#D6A84F" stroke-width="2"/>
+    <text x="112" y="344" fill="#66502B" font-size="19" font-weight="750" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace">memory/<tspan font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" font-weight="400" fill="#6F6148"> 目录 · 跨 session 持久化存储</tspan></text>
+
+    <!-- Entry files: two stacked layers, header on top of body -->
+    <text x="112" y="384" fill="#66502B" font-size="15" font-weight="750">记忆条目文件</text>
+    <rect x="112" y="392" width="560" height="38" rx="10" fill="#FFFFFF" stroke="#D6A84F" stroke-width="2"/>
+    <text x="132" y="416" fill="#66502B" font-size="13.5"><tspan font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace">header</tspan>：名字 + 描述</text>
+    <text x="652" y="416" fill="#8A8378" font-size="12" text-anchor="end">两条管线都先扫这层</text>
+    <rect x="112" y="434" width="560" height="52" rx="10" fill="#FFFFFF" stroke="#D6A84F" stroke-width="2"/>
+    <text x="132" y="453" fill="#6F6148" font-size="13.5">正文：完整记忆内容</text>
+    <text x="652" y="453" fill="#8A8378" font-size="12" text-anchor="end">命中才读取</text>
+    <rect x="132" y="460" width="47" height="20" rx="10" fill="#FFF6DD" stroke="#D6A84F" stroke-width="1.5"/>
+    <text x="155.5" y="474" fill="#725420" font-size="11.5" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace">user</text>
+    <rect x="189" y="460" width="76" height="20" rx="10" fill="#FFF6DD" stroke="#D6A84F" stroke-width="1.5"/>
+    <text x="227" y="474" fill="#725420" font-size="11.5" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace">feedback</text>
+    <rect x="275" y="460" width="68" height="20" rx="10" fill="#FFF6DD" stroke="#D6A84F" stroke-width="1.5"/>
+    <text x="309" y="474" fill="#725420" font-size="11.5" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace">project</text>
+    <rect x="353" y="460" width="83" height="20" rx="10" fill="#FFF6DD" stroke="#D6A84F" stroke-width="1.5"/>
+    <text x="394.5" y="474" fill="#725420" font-size="11.5" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace">reference</text>
+
+    <!-- MEMORY.md index box -->
+    <rect x="900" y="392" width="314" height="94" rx="12" fill="#FFFFFF" stroke="#D6A84F" stroke-width="2"/>
+    <text x="924" y="420" fill="#66502B" font-size="18" font-weight="750" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace">MEMORY.md</text>
+    <rect x="1106" y="402" width="88" height="24" rx="12" fill="#E8F3FF" stroke="#5A9FD6" stroke-width="2"/>
+    <text x="1150" y="418" fill="#254A66" font-size="12" text-anchor="middle">常驻上下文</text>
+    <text x="924" y="446" fill="#6F6148" font-size="13.5">记忆库目录 · 类比 CLAUDE.md</text>
+    <text x="924" y="468" fill="#6F6148" font-size="13.5">读写共用索引 · 写入时同步更新</text>
+    <text x="760" y="432" fill="#8A8378" font-size="12.5">索引指向</text>
+
+    <!-- ===== Bottom lane: read pipeline (on demand) ===== -->
+    <text x="86" y="522" fill="#8A8378" font-size="15" font-weight="720">读取管线 · 按需（旁路）</text>
+
+    <!-- R1: user request -->
+    <rect x="86" y="532" width="184" height="110" rx="15" fill="#E8F3FF" stroke="#5A9FD6" stroke-width="2"/>
+    <text x="108" y="570" fill="#254A66" font-size="19" font-weight="760">用户请求到来</text>
+    <text x="108" y="596" fill="#445D70" font-size="13.5">user prompt</text>
+
+    <!-- R2: sidecar small model -->
+    <rect x="300" y="532" width="240" height="110" rx="15" fill="#F2F7EA" stroke="#8DB36D" stroke-width="2"/>
+    <text x="324" y="570" fill="#3E5A2A" font-size="19" font-weight="760">旁路小模型</text>
+    <text x="324" y="596" fill="#526445" font-size="13.5">sonnet · 限 256 token 输出</text>
+    <text x="324" y="618" fill="#526445" font-size="13.5">运行在主上下文之外</text>
+
+    <!-- R3: scan headers, pick <=5 (decision) -->
+    <rect x="570" y="532" width="300" height="110" rx="26" fill="#FFFFFF" stroke="#8D867B" stroke-width="2"/>
+    <text x="594" y="570" fill="#3A362F" font-size="19" font-weight="760">扫 header，挑出 ≤ 5 条</text>
+    <text x="594" y="596" fill="#68645E" font-size="13.5">只看未被读取条目的 header</text>
+    <text x="594" y="618" fill="#68645E" font-size="13.5">选中后取回完整内容</text>
+
+    <!-- R4: inject into current turn -->
+    <rect x="900" y="532" width="314" height="110" rx="15" fill="#E8F3FF" stroke="#5A9FD6" stroke-width="2"/>
+    <text x="924" y="570" fill="#254A66" font-size="19" font-weight="760">注入当轮对话</text>
+    <text x="924" y="596" fill="#445D70" font-size="13.5">完整内容拼接为 Memory Context</text>
+    <text x="924" y="618" fill="#445D70" font-size="13.5">推理开始前 · 以附件形式</text>
+
+    <!-- Labels on vertical dashed arrows -->
+    <text x="654" y="514" fill="#56514A" font-size="13">读 header → 取正文</text>
+    <text x="1044" y="514" fill="#56514A" font-size="13" text-anchor="end">兜底：主 Agent 据此 tool call 直读</text>
+
+    <!-- ===== Bottom note zone: anchors vs Skills ===== -->
+    <text x="86" y="672" fill="#8A8378" font-size="15" font-weight="720">与 Skills 的对照</text>
+    <text x="262" y="672" fill="#5F5A52" font-size="14.5">条目 header ≈ Skills 的 <tspan font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13.5">description</tspan> 层；条目正文 ≈ <tspan font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13.5">SKILL.md</tspan> 正文：先扫索引，命中才读全文</text>
+    <text x="262" y="696" fill="#5F5A52" font-size="14.5">关键差异：Skill 由主模型自己决定加载；memory 由旁路小模型代选，漏选时主 Agent 凭 <tspan font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13.5">MEMORY.md</tspan> 兜底</text>
+  </g>
+
+  <!-- Solid arrows: write pipeline, ending in upsert into storage -->
+  <g stroke="#8C846F" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M270 219H292" marker-end="url(#arrow)"/>
+    <path d="M540 219H562" marker-end="url(#arrow)"/>
+    <path d="M870 219H892" marker-end="url(#arrow)"/>
+    <path d="M1057 274V304" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- Thin dashed arrow: MEMORY.md catalogs the entries -->
+  <path d="M892 440H684" stroke="#B8965A" stroke-width="2" stroke-dasharray="4 6" stroke-linecap="round" marker-end="url(#arrow)"/>
+
+  <!-- Dashed arrows: on-demand read pipeline + fallback direct read -->
+  <g stroke="#8C846F" stroke-width="2.5" stroke-dasharray="7 8" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M640 494V524" marker-end="url(#arrow)"/>
+    <path d="M1057 494V524" marker-end="url(#arrow)"/>
+    <path d="M270 587H292" marker-end="url(#arrow)"/>
+    <path d="M540 587H562" marker-end="url(#arrow)"/>
+    <path d="M870 587H892" marker-end="url(#arrow)"/>
+  </g>
+</svg>

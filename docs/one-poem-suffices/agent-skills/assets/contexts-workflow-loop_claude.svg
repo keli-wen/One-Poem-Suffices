@@ -1,0 +1,72 @@
+<svg width="1200" height="560" viewBox="0 0 1200 560" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="560" rx="36" fill="#F7F4EF"/>
+  <rect x="40" y="40" width="1120" height="480" rx="28" fill="#FFFDF8" stroke="#D8D1C7" stroke-width="2"/>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#8C846F"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="76" y="98" fill="#1F1F1F" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="34" font-weight="760"><tspan font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace">contexts/</tspan> 工作流学习回路</text>
+  <text x="76" y="134" fill="#68645E" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="19">把任务拆成 context 任务与 execution 任务，再用每次 session 的执行轨迹迭代程序性知识。</text>
+
+  <g font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <!-- Main flow, node 1: context task -->
+    <rect x="76" y="180" width="220" height="116" rx="15" fill="#E8F3FF" stroke="#5A9FD6" stroke-width="2"/>
+    <text x="100" y="222" fill="#254A66" font-size="21" font-weight="760">Context 任务</text>
+    <text x="100" y="250" fill="#445D70" font-size="16">探索 / explore</text>
+    <text x="100" y="275" fill="#445D70" font-size="14">先行探索代码库与需求</text>
+
+    <!-- Main flow, node 2: handoff artifact -->
+    <rect x="352" y="180" width="220" height="116" rx="15" fill="#FFF6DD" stroke="#D6A84F" stroke-width="2"/>
+    <text x="376" y="222" fill="#66502B" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="20" font-weight="750">contexts/*.md</text>
+    <text x="376" y="249" fill="#6F6148" font-size="16">handoff 上下文</text>
+    <rect x="376" y="257" width="134" height="26" rx="13" fill="#FFFFFF" stroke="#D6A84F" stroke-width="2"/>
+    <text x="391" y="275" fill="#725420" font-size="13.5">计划 = prediction</text>
+
+    <!-- Main flow, node 3: impl task -->
+    <rect x="628" y="180" width="200" height="116" rx="15" fill="#F2F7EA" stroke="#8DB36D" stroke-width="2"/>
+    <text x="652" y="230" fill="#3E5A2A" font-size="21" font-weight="760">Execution 任务</text>
+    <text x="652" y="260" fill="#526445" font-size="16">执行 / execute</text>
+
+    <!-- Main flow, node 4: trace + feedback -->
+    <rect x="874" y="180" width="250" height="116" rx="15" fill="#F6F2EA" stroke="#8D867B" stroke-width="2"/>
+    <text x="898" y="226" fill="#3A362F" font-size="21" font-weight="760">执行轨迹 + 用户反馈</text>
+    <rect x="898" y="244" width="108" height="26" rx="13" fill="#FFFFFF" stroke="#8D867B" stroke-width="2"/>
+    <text x="912" y="262" fill="#56514A" font-size="13.5">ground truth</text>
+
+    <!-- Loop row: compare node (decision) -->
+    <rect x="700" y="372" width="260" height="92" rx="26" fill="#FFFFFF" stroke="#8D867B" stroke-width="2"/>
+    <text x="726" y="410" fill="#3A362F" font-size="20" font-weight="760">对比：计划 vs 轨迹</text>
+    <text x="726" y="438" fill="#68645E" font-size="14">有何出入、什么值得沉淀</text>
+
+    <!-- Loop row: update node (amber echoes node 2, both are persisted knowledge) -->
+    <rect x="340" y="372" width="300" height="92" rx="15" fill="#FFF6DD" stroke="#D6A84F" stroke-width="2"/>
+    <text x="362" y="412" fill="#66502B" font-size="20" font-weight="760">更新 Skill / context 文件</text>
+    <text x="362" y="440" fill="#6F6148" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13.5">SKILL.md · contexts/*.md</text>
+
+    <!-- Label on the dashed return arrow -->
+    <text x="480" y="330" fill="#56514A" font-size="16" font-weight="740">沉淀 / refine</text>
+    <text x="480" y="353" fill="#68645E" font-size="13.5">下一次任务直接复用</text>
+
+    <!-- Muted caption for the loop row -->
+    <text x="76" y="424" fill="#8A8378" font-size="15" font-weight="720">学习回路 / learning loop</text>
+
+    <!-- Footnote -->
+    <text x="76" y="498" fill="#5F5A52" font-size="18">一次 session = 一次流程执行；回路 = 发生在权重之外的学习</text>
+  </g>
+
+  <!-- Solid arrows: main flow plus the fold-back into the loop -->
+  <g stroke="#8C846F" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M296 238H344" marker-end="url(#arrow)"/>
+    <path d="M572 238H620" marker-end="url(#arrow)"/>
+    <path d="M828 238H866" marker-end="url(#arrow)"/>
+    <path d="M999 296V418H966" marker-end="url(#arrow)"/>
+    <path d="M700 418H646" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- Dashed return arrow: update node back into contexts/*.md -->
+  <path d="M462 372V303" stroke="#8C846F" stroke-width="2.5" stroke-dasharray="7 8" stroke-linecap="round" marker-end="url(#arrow)"/>
+</svg>
