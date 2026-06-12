@@ -9,6 +9,8 @@ repo_url = "https://github.com/keli-wen/One-Poem-Suffices"
 
 copyright = "Copyright &copy; 2025 Keli Wen"
 
+extra_css = ["assets/stylesheets/extra.css"]
+
 nav = [
     { "首页" = "index.md" },
     { "One Poem Suffices" = [

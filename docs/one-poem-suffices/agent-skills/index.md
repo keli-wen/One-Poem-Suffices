@@ -1,16 +1,22 @@
-![Agent-Skills-Header](./assets/Agent-Skills-Header.png)
+<div align="center">
+  <img src="./assets/Agent-Skills-Header.png" alt="Agent-Skills-Header" />
+</div>
 
 # Agent Skills，一篇就够了。
 
 `READ⏰: 50min`
 
-> ☁️ *One Poem Suffices · "Don't Build Agents, Build Skills Instead"*
+!!! ambition "One Poem Suffices"
+
+    ☁️ *"Don't Build Agents, Build Skills Instead"*
 
 Agent Skills（下文简称 Skills）无疑是 2025 年末到现在最热门的话题之一。我其实很早就写了篇草稿，但当时缺少实践经验，写出来流于解释。这段时间工程师圈子里更热的话题是 Harness Engineering，我借着这类工程实践积累了一些 Skills 实操的 insights，回头把这篇重写了几遍，希望能提供一些理解 Agent Skills 的不同视角。
 
 从格式标准上看，Skills 很简单：一个文件夹，一个 `SKILL.md`，再加可选的脚本和参考资料。它不像一个新的 Agent Framework，也不像 MCP 那样标准化外部能力的接入，更像一种可以被不同 Agent Harness 读取的轻量 packaging。你完全可以用很少的代码给大部分 Agent Framework 实现 Skills 这个 feature（参考 [agentskills/skills-ref](https://github.com/agentskills/agentskills/tree/main/skills-ref/src/skills_ref) 和 [Agent Skills Specification](https://agentskills.io/specification)）。但围绕它的讨论热度一直在发酵：有一段时间 GitHub Trending 上频繁出现 Skills / agent-guideline 类的 repo，例如 [`andrej-karpathy-skills`](https://github.com/multica-ai/andrej-karpathy-skills) 已经超过 150k stars。
 
-![agent-skills-equipping-agents-skill-metadata](./assets/agent-skills-equipping-agents-skill-metadata.jpg)
+<div align="center">
+  <img src="./assets/agent-skills-equipping-agents-skill-metadata.jpg" alt="agent-skills-equipping-agents-skill-metadata" />
+</div>
 
 **"Skills 真的这么有用吗？"** 这是我最初读相关文章时反复问自己的问题，毕竟它的设计实在太简单。但现在，我绝大部分任务都有项目级和个人级的 Skills 来降低**控制 / 对齐**成本：让 Agent follow 我设计好的流程，让模型的输出风格和内容对齐我的偏好。从 [The Bitter Lesson](https://www.cs.utexas.edu/~eunsol/courses/data/bitter_lesson.pdf) 的长期视角看，把人类知识硬编码进 AI 系统往往不是最可扩展的路线；但在具体的任务工程里，我们要的不是推进通用智能的边界，而是把任务高效做完，把自己的**思考预算**留给真正需要品味和判断的环节。Skills 的整个定义也很符合 Anthropic 的工程价值观：***Do the simple thing that works***。
 
@@ -24,7 +30,9 @@ Skills 给 Agent 提供的是什么？Anthropic Skills 团队负责人 Barry Zha
 
 但只到这里，对我而言还有一个困惑没有解开：**Skills 的本质是什么？** 如果只跟着 Anthropic 的官方叙事走，很容易把它解读成"一种 Agent 能力的打包格式"，这篇也会变成多篇 Anthropic 博客的综合解读，那大可不必由我来写（Opus / GPT 可能更适合）。回到第一性原理想这个问题，结合我之前写博客的一些思考，我的理解从两个点出发。
 
-<img src="../context-engineering/assets/context-type-definition.png" alt="context-type-definition" style="zoom: 15%;" />
+<div align="center">
+  <img src="../context-engineering/assets/context-type-definition.png" alt="context-type-definition" style="zoom: 15%;" />
+</div>
 
 **第一，Skills 本质上就是 Context。** 技术上你完全可以在 Skills 文件夹里放任何类型的上下文。按我在[《Context Engineering，一篇就够了》](https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/context-engineering/)里的分类，既可以是指导性上下文，也可以是信息性上下文：事实数据、API 文档、甚至 RAG 索引。所以"提供什么类型的知识"并不是 Skills 最核心的创新，朴素的 Context 文件也可以提供 Procedural Knowledge。
 
@@ -44,7 +52,7 @@ Skills 给 Agent 提供的是什么？Anthropic Skills 团队负责人 Barry Zha
 - **Why？** 为什么是现在，为什么是这种形态？通用 Agent 的崛起和 Skills 之间是什么关系？
 - **How？** 构建一个好 Skill 的最佳实践是什么？
 
-为了保证正文的阅读流畅性，我把一些延伸讨论放进了附录～ 这篇博客”呕心沥血“，写了好几周，希望大家多多支持～
+为了保证正文的阅读流畅性，我把一些延伸讨论放进了附录～ 这篇博客“呕心沥血”，写了好几周，希望大家多多支持～
 
 ## 1. What is a Skill?
 
@@ -59,7 +67,9 @@ Anthropic 对 Skill 的定义很简单：
 
 文件夹可以被人阅读、被 Git 管理、被团队分享，也能被 Agent 用 `Read` / `Bash` / 文件系统原语操作。任何人都可以在电脑上建一个文件夹，写一个 `SKILL.md`，然后所见即所得地迭代。这对于更多的 No-Tech 用户非常友好。
 
-![skill-folder-context-semantics](./assets/skill-folder-context-semantics-gpt.png)
+<div align="center">
+  <img src="./assets/skill-folder-context-semantics-gpt.png" alt="skill-folder-context-semantics" />
+</div>
 
 这张 GPT 画的图展示了 Skill 核心的结构与设计：**只有少量 metadata 常驻上下文，作为 trigger 让 Agent 决定要不要进一步加载；其余所有内容都留在文件夹里，由 Agent 按需自行拉取。** 三层结构对应的 token 量级：
 
@@ -87,7 +97,9 @@ Skills 的核心机制和 JIT Context 一致：**引用即上下文 + 渐进式�
 
 `scripts/` 本质上就是 Tools（Anthropic 的原话也是 "scripts as tools"）。而工具对模型来说一直都是 Context：模型并不真的"执行"任何东西，它看到工具的定义（绝大部分 Harness 在创建新 Session 时会把工具定义注入上下文），吐出一行调用，再等结果以 token 回来，执行发生在模型之外的 Harness 里。所以引言说"Skills 本质是 Context"是把 `scripts/` 算在内的：它就是行动性上下文，只是定义放进了文件系统。这带来两个传统 Tools 没有的性质。其一，**定义可读可改**：传统 Tool 的描述（docstring）写得再含糊，模型也只能将就着用；script 是文件，代码本身就是最准确的定义，模型必要时可以直接读源码并做改动，不用时则安静地待在文件系统里。其二，**它不承诺可执行**：script 只提供"这里有个工具、这么用"的上下文，真跑起来缺依赖、环境不对，都要 Agent 自己当场解决（[frontmatter](https://agentskills.io/specification#frontmatter) 的 `compatibility` 字段就是用来提前声明环境要求的）。
 
-![equipping-agents-skill-file-structure](./assets/equipping-agents-skill-file-structure.jpg)
+<div align="center">
+  <img src="./assets/equipping-agents-skill-file-structure.jpg" alt="equipping-agents-skill-file-structure" />
+</div>
 
 *Skill 的 metadata 挂在 agent 配置中，文件夹内容则活在 agent 虚拟机的文件系统里，与 Bash / Python / Node 运行时为邻；MCP server 在远端。Source: [Equipping agents for the real world with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)*
 
@@ -150,7 +162,9 @@ Anthropic 的 [Extending Claude with Skills and MCP](https://claude.com/blog/ext
 
 而且两者是**多对多**的关系：一个财务分析 Skill 可以同时编排好几个数据源 MCP（行情一个、财报一个、研报一个），一个 GitHub MCP 也可以被 Code Review、Issue 分类、Release 等多个 Skill 复用。两个生态互相增强，而非互相替代。
 
-<img src="./assets/agent-skills-skills-mcp-skills-mcp-diagram.png" alt="agent-skills-skills-mcp-skills-mcp-diagram" style="zoom: 20%;" />
+<div align="center">
+  <img src="./assets/agent-skills-skills-mcp-skills-mcp-diagram.png" alt="agent-skills-skills-mcp-skills-mcp-diagram" style="zoom: 20%;" />
+</div>
 
 从 Context 的角度看：MCP 提供的基本全是**行动性上下文**：工具定义、工具结果，加上把外部数据搬进窗口的通道（严格说 MCP 规范里还有 `prompts` 和 `resources` 两类原语，但生态的重心在 `tools`，这里按主流用法讨论）。Skill 文件夹里装载三类上下文（见 1.4 节），但它的重心是**指导性上下文**："拿到数据之后该怎么处理"，两者之中只有 Skill 在负责这件事。所以可以说：MCP 决定 Agent 能调用什么，Skill 决定它知道怎么用。两者不在同一层，是互补的。
 
@@ -160,7 +174,9 @@ Subagent 和 Skill 其实不在一个层面上，不太能直接比较。Subagen
 
 那它们怎么联系起来？我个人觉得关键在编排 Subagent 时的一个必要环节：**每次派生 Subagent，都要给它足够的 Handoff 上下文**，包括任务背景、工具用法和流程规范。当你的 Agent 反复为**同类任务**派生 Subagent 时，这些上下文在不同 delegation 之间高度重复，同一套东西一遍遍重讲。（例如我之前每次 spawn 新的 Subagent 时，都需要显式要求它基于任务类型按我的规范做进度记录，特别麻烦）
 
-![subagent-delegation-with-skill](./assets/subagent-delegation-with-skill_claude.png)
+<div align="center">
+  <img src="./assets/subagent-delegation-with-skill_claude.png" alt="subagent-delegation-with-skill" />
+</div>
 
 Skill 正好补上这一环。把这套重复的上下文和工具用法沉淀成一个 Skill，Subagent 派生时不必每次重新拼装，语义命中就加载。Anthropic 也在博客中推荐了 Subagent 和 Skills 的组合。例如，在我自己的项目中，如果是数据库实现任务，Orchestrator Agent 会基于我的 `my-work` Skill（为了方便理解，这里改了下名字）设计 verify checklist，要求另一个 Agent 最后用 [supabase-postgres-best-practices Skill](https://github.com/supabase/agent-skills/tree/main/skills/supabase-postgres-best-practices) 做 Review。如果是前端相关任务，则会自动要求用 [react-best-practices Skill](https://github.com/vercel-labs/agent-skills/blob/main/skills/react-best-practices/SKILL.md) 做 Review。整个流程很自然，也可以进一步配合 Hooks。
 
@@ -180,7 +196,9 @@ Skill 正好补上这一环。把这套重复的上下文和工具用法沉淀�
 
 在读取方式上，Memory 和 Skills 都是按需读取那套。我基于 Claude Code auto-memory 的机制制作了如下图片。其中上半部分是 Memory 的更新，下半部分则是读取。
 
-![memory-mechanism-loop](./assets/memory-mechanism-loop_claude-v2.png)
+<div align="center">
+  <img src="./assets/memory-mechanism-loop_claude-v2.png" alt="memory-mechanism-loop" />
+</div>
 
 *Claude Code 中的 auto-memory 机制*
 
@@ -224,7 +242,9 @@ Skills 团队自己讲过一个很形象的类比：报税这件事，你会交�
 
 过去大家很自然地认为：不同领域需要不同 Agent。法律 Agent、财务 Agent、科研 Agent，各有自己的工具、System Prompt 和工作流。这个思路看起来合理，因为每个领域的任务差异确实很大。
 
-<img src="./assets/building-agents-fig1-before.png" style="zoom: 20%;" />
+<div align="center">
+  <img src="./assets/building-agents-fig1-before.png" alt="building-agents-fig1-before" style="zoom: 20%;" />
+</div>
 
 但 Anthropic 基于 Claude Code 的经验给出了另一个判断，并且 Codex 随后发扬光大：
 
@@ -236,7 +256,9 @@ Skills 团队自己讲过一个很形象的类比：报税这件事，你会交�
 
 此时限制你的不再是个人时间：只要有足够的 tokens，你可以轻松并行 10 份报告，tokens 直接换算成 workforce。营销方案也类似：从 CRM 抓客户数据、跑分析脚本、生成 slide 和 brief。尽管领域不同，Agent 用的基本工具是同一套：**终端、文件系统、代码执行，加上几个外部 Tool / API**。我现在的 codebase 里就有大量 Automation 在帮我做各类任务。
 
-<img src="./assets/building-agents-fig2-today.png" style="zoom: 20%;" />
+<div align="center">
+  <img src="./assets/building-agents-fig2-today.png" alt="building-agents-fig2-today" style="zoom: 20%;" />
+</div>
 
 从过去为每个领域精心构建一套 Agent loop，到现在 Coding Agent 涌现出解决各种任务的通用能力，我个人感觉**关键是在模型基础智能达标后，其 Agentic 能力也迈过门槛**。（反例是 Gemini 3.1 Pro 这个模型，Agent 能力严重拖累模型智能）
 
@@ -244,9 +266,13 @@ Claude Code 首先证明了 Coding Agent 可以承担通用任务（大致从 Op
 
 当底层 Agent 足够通用，工程重点自然从**为每个领域造一个新 Agent**，转向**给同一个通用 Agent 装上可插拔的专业知识**。这和 Push → Pull 是同一个趋势：Agent 越通用，越需要一种轻量的方式按需加载领域知识，而不是每次都从零开始教。
 
-![agent-skills-building-agents-fig3-architecture](./assets/agent-skills-building-agents-fig3-architecture.png)
+<div align="center">
+  <img src="./assets/agent-skills-building-agents-fig3-architecture.png" alt="agent-skills-building-agents-fig3-architecture" />
+</div>
 
-![agent-skills-analogy](./assets/agent-skills-analogy.png)
+<div align="center">
+  <img src="./assets/agent-skills-analogy.png" alt="agent-skills-analogy" />
+</div>
 
 *模型像处理器，Agent Runtime 像操作系统，Skills 是应用层。Source: [Building agents with Skills](https://claude.com/blog/building-agents-with-skills-equipping-agents-for-specialized-work)*
 
@@ -254,12 +280,15 @@ Claude Code 首先证明了 Coding Agent 可以承担通用任务（大致从 Op
 
 Anthropic 认为 Skills 是**走向 continuous learning 的一个 concrete step**。这里的 learning 并不是模型参数的更新，指的是让 Claude 写下来的流程、脚本、偏好和失败经验，可以被未来的自己复用。
 
-> Claude 写下来的任何东西，都能被未来版本的自己高效使用。这让学习真正变得可迁移。*"Anything that Claude writes down can be used efficiently by a future version of itself. This makes the learning actually transferable."*
->
+!!! ambition "Continuous learning"
+
+    Claude 写下来的任何东西，都能被未来版本的自己高效使用。这让学习真正变得可迁移。*"Anything that Claude writes down can be used efficiently by a future version of itself. This makes the learning actually transferable."*
 
 任务执行中积累的失败模式、用户偏好、验证流程，沉淀为结构化的上下文：标准流程写入 `SKILL.md`，可复用代码写入 `scripts/`，详细文档写入 `references/`。下次遇到同类任务，Agent 无需从头探索，直接从已有经验出发。
 
-<img src="./assets/externalized-continual-learning.png" alt="externalized continual learning" style="zoom:23%;" />
+<div align="center">
+  <img src="./assets/externalized-continual-learning.png" alt="externalized continual learning" style="zoom:23%;" />
+</div>
 
 我的实践之一是在项目中维护 `contexts/` 文件夹，将任务拆分为两个阶段：**Context（探索）** 与 **Execution（执行）**。Context 任务负责探索问题空间并输出 Context 文件（包括必要的实验性工具调用）；通过在探索阶段投入更多 tokens（explore token scaling），为执行阶段构建更精准的 Handoff 上下文，以期找到更优的实现路径。因为执行阶段涉及大量代码变更，试错成本远高于探索阶段。
 
@@ -267,7 +296,9 @@ Anthropic 认为 Skills 是**走向 continuous learning 的一个 concrete step*
 
 基于解决任务的 Session 进行学习，与让 Agent 凭空直接写 Skills 有本质区别：后者没有 ground truth。
 
-![contexts-workflow-loop](./assets/contexts-workflow-loop_claude.png)
+<div align="center">
+  <img src="./assets/contexts-workflow-loop_claude.png" alt="contexts-workflow-loop" />
+</div>
 
 **为什么 Skills 的更新可以视为持续学习？**
 
@@ -336,7 +367,9 @@ Anthropic 认为 Skills 是**走向 continuous learning 的一个 concrete step*
 
 实操中值得关注的工作流是 **Claude A / Claude B 双实例**：A 负责设计 Skill，B 在干净的上下文中测试，避免自我确认偏差。
 
-![skill-creator-description-optimization](./assets/skill-creator-description-optimization.png)
+<div align="center">
+  <img src="./assets/skill-creator-description-optimization.png" alt="skill-creator-description-optimization" />
+</div>
 
 上图展示了 skill-creator 优化 `description` 的实测效果。图中涵盖 5 类文档对应的 Skills，经过 `description` 调整后，在 held-out 测试集上均获得了触发准确度的提升。基于这个数据可以推导得到：**Skills 触发相关的问题是可 Eval、可优化的**。至于更具体的方法论（Eval 如何构建、测试集如何划分、跨模型测试与盲测 A/B 如何执行）属于进阶内容，为了不影响阅读流畅性，我这里也渐进式披露给大家：建议参阅 [Complete Guide](https://claude.com/blog/complete-guide-to-building-skills-for-claude) 和 [Improving Skill Creator](https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills)，或交给 skill-creator 代为生成和运行。
 
@@ -471,7 +504,9 @@ Skills 逐步解决了 **怎么做好** 的问题，但 2026 年的主题属于 
 
 2.4 节提出了几条观察，本节展开其背后的理论依据与技术细节。
 
-![three-types-of-memory](./assets/three-types-of-memory.png)
+<div align="center">
+  <img src="./assets/three-types-of-memory.png" alt="three-types-of-memory" />
+</div>
 
 **三类记忆与 Skills 的定位**
 
@@ -497,7 +532,9 @@ Skills 逐步解决了 **怎么做好** 的问题，但 2026 年的主题属于 
 
 [SkillsBench](https://www.oreilly.com/radar/agent-skills-work-but-the-research-shows-most-teams-are-building-them-wrong/) 的对照实验（84 个任务、11 个领域）提供了几项值得关注的结论。
 
-![skillsbench-evaluation-results](./assets/skillsbench-evaluation-results.png)
+<div align="center">
+  <img src="./assets/skillsbench-evaluation-results.png" alt="skillsbench-evaluation-results" />
+</div>
 
 | 发现                                        | 含义                                             |
 | ------------------------------------------- | ------------------------------------------------ |

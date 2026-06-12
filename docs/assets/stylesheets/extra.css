@@ -1,0 +1,16 @@
+.md-typeset .admonition.ambition,
+.md-typeset details.ambition {
+  background-color: rgba(124, 77, 255, 0.10);
+}
+
+.md-typeset .ambition > .admonition-title::before,
+.md-typeset .ambition > summary::before {
+  background-color: #7c4dff;
+  -webkit-mask-image: var(--md-admonition-icon--abstract);
+  mask-image: var(--md-admonition-icon--abstract);
+}
+
+.md-typeset .ambition > .admonition-title::after,
+.md-typeset .ambition > summary::after {
+  color: #7c4dff;
+}
