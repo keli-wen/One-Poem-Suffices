@@ -1,16 +1,26 @@
+.md-typeset {
+  --one-poem-ambition-bg: rgba(235, 219, 188, 0.42);
+  --one-poem-ambition-accent: #cc785c;
+}
+
+[data-md-color-scheme="slate"] .md-typeset {
+  --one-poem-ambition-bg: rgba(204, 120, 92, 0.18);
+  --one-poem-ambition-accent: #d4a27f;
+}
+
 .md-typeset .admonition.ambition,
 .md-typeset details.ambition {
-  background-color: rgba(124, 77, 255, 0.10);
+  background-color: var(--one-poem-ambition-bg);
 }
 
 .md-typeset .ambition > .admonition-title::before,
 .md-typeset .ambition > summary::before {
-  background-color: #7c4dff;
+  background-color: var(--one-poem-ambition-accent);
   -webkit-mask-image: var(--md-admonition-icon--abstract);
   mask-image: var(--md-admonition-icon--abstract);
 }
 
 .md-typeset .ambition > .admonition-title::after,
 .md-typeset .ambition > summary::after {
-  color: #7c4dff;
+  color: var(--one-poem-ambition-accent);
 }
