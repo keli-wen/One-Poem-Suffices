@@ -68,20 +68,27 @@
 \definecolor{opclaydeep}{HTML}{C0593B}% 陶土加深（小字号 / 链接）
 \definecolor{opline}{HTML}{E5E0DB}    % 细线
 \definecolor{opcream}{HTML}{F5F1E8}   % 代码 / 行内代码底色（oat）
-% callout 背景色板（Claude palette 低饱和衍生，用背景色区分类型）
-\definecolor{opbgnote}{HTML}{F0EBE1}      % oat
-\definecolor{opbgtip}{HTML}{E9EFE2}       % bud green
-\definecolor{opbgquestion}{HTML}{EDE9F3}  % heather
-\definecolor{opbginfo}{HTML}{E7EFF3}      % sky
-\definecolor{opbgimportant}{HTML}{FAE9E1} % clay tint
-\definecolor{opbgwarn}{HTML}{F6E0D9}      % terra tint
-% callout 图标深色
+% callout 语义色：取自 Anthropic 官方 PDF 实测色板
+\definecolor{opacnote}{HTML}{E3DBCD}      % oat（中性）
+\definecolor{opactip}{HTML}{788D5D}       % olive
+\definecolor{opacquestion}{HTML}{9C8BC7}  % periwinkle
+\definecolor{opacinfo}{HTML}{6B9BCC}      % sky
+\definecolor{opacwarn}{HTML}{C46687}      % rose（色板中最接近警示语义的色相）
+\definecolor{opacsage}{HTML}{BCD2CB}      % pale sage（备用：引文底 / 第七类）
+% 背景 = 品牌色低浓度淡化（用背景色区分类型）
+\colorlet{opbgnote}{opacnote!55!white}
+\colorlet{opbgtip}{opactip!15!white}
+\colorlet{opbgquestion}{opacquestion!16!white}
+\colorlet{opbginfo}{opacinfo!15!white}
+\colorlet{opbgimportant}{opclay!15!white}
+\colorlet{opbgwarn}{opacwarn!14!white}
+% 图标 = 品牌色本色（偏浅的色相加深一档保证小字号清晰）
 \definecolor{opicnote}{HTML}{8A7355}
-\definecolor{opictip}{HTML}{5E7A4E}
-\definecolor{opicquestion}{HTML}{6E5A8C}
-\definecolor{opicinfo}{HTML}{4E7287}
-\definecolor{opicimportant}{HTML}{C0593B}
-\definecolor{opicwarn}{HTML}{A8432F}
+\colorlet{opictip}{opactip}
+\colorlet{opicquestion}{opacquestion!72!black}
+\colorlet{opicinfo}{opacinfo!72!black}
+\colorlet{opicimportant}{opclaydeep}
+\colorlet{opicwarn}{opacwarn!82!black}
 
 \color{opink}
 \arrayrulecolor{opink}
@@ -205,15 +212,19 @@
 \titlespacing*{\subsection}{0pt}{1.5em}{0.4em}
 \titlespacing*{\subsubsection}{0pt}{1.2em}{0.3em}
 % 不编号章头：自定义胶囊文字 + 衬线大标题（用于 Appendix 等 end matter）
+% 同时注册 TOC 条目（条目形如「Appendix A · 标题」）
 \newcommand{\opsectionx}[2]{%
   \par\vspace{1.9em}%
+  \phantomsection\addcontentsline{toc}{section}{#1\hspace{0.5em}·\hspace{0.5em}#2}%
   {\centering\parbox{\linewidth}{\centering
     \op@sectionpill{#1}\\[0.8em]
     {\opserif\fontsize{15.5}{21.5}\selectfont\color{opink}#2}}\par}%
   \vspace{1.0em}\@afterheading}
 % 仅胶囊的轻量章头（用于 References 这类 end matter 分隔）
 \newcommand{\opsectionpillonly}[1]{%
-  \par\vspace{1.9em}{\centering\op@sectionpill{#1}\par}%
+  \par\vspace{1.9em}%
+  \phantomsection\addcontentsline{toc}{section}{#1}%
+  {\centering\op@sectionpill{#1}\par}%
   \vspace{1.0em}\@afterheading}
 
 %% ---------------------------------------------------------------- 链接
@@ -339,31 +350,41 @@
 %% ---------------------------------------------------------------- 目录 (TOC)
 \RequirePackage{tocloft}
 \tocloftpagestyle{opmain}
-\renewcommand{\contentsname}{Contents}
-\renewcommand{\cfttoctitlefont}{\opserif\fontsize{17}{22}\selectfont\color{opink}}
-\setlength{\cftaftertoctitleskip}{2em}
+\setcounter{tocdepth}{2}
+% 标题：与章头同语言的居中 letterspaced 小标签
+\renewcommand{\contentsname}{\oplabel{Contents}}
+\renewcommand{\cfttoctitlefont}{\hspace*{\fill}\fontsize{7.5}{7.5}\selectfont\color{opmuted!80!opink}}
+\renewcommand{\cftaftertoctitle}{\hspace*{\fill}}
+\setlength{\cftbeforetoctitleskip}{0em}
+\setlength{\cftaftertoctitleskip}{1.15em}
 
-% 目录局部去掉红色的超链接颜色，使用正文墨色
-\let\oldtableofcontents\tableofcontents
-\renewcommand{\tableofcontents}{%
+% 目录页命令：局部去掉超链接颜色（必须在调用时设置，
+% tocloft 会在 begin-document 时重定义 \tableofcontents，包装会被覆盖）
+\newcommand{\opmaketoc}{%
   \begingroup
   \hypersetup{linkcolor=opink}%
-  \oldtableofcontents
+  \tableofcontents
   \endgroup
-}
+  \newpage}
 
-% Section 样式：缩小字号和间距以容纳 Appendix
-\renewcommand{\cftsecfont}{\rmfamily\bfseries\fontsize{10.2}{15}\selectfont\color{opink}}
-\renewcommand{\cftsecpagefont}{\sffamily\fontsize{8.5}{15}\selectfont\color{opmuted}}
+% Section 样式：衬线 Semibold 墨色，编号陶土色
+\renewcommand{\cftsecfont}{\rmfamily\bfseries\fontsize{9.2}{12.8}\selectfont\color{opink}}
+\renewcommand{\cftsecpagefont}{\rmfamily\fontsize{8}{12.8}\selectfont\color{opmuted}}
 \renewcommand{\cftsecleader}{\hfill}
-\setlength{\cftbeforesecskip}{0.6em}
+\renewcommand{\cftsecpresnum}{\color{opclay}}
+\renewcommand{\cftsecaftersnum}{\color{opink}}
+\setlength{\cftbeforesecskip}{0.36em}
+\setlength{\cftsecnumwidth}{1.5em}
 
 % Subsection 样式：衬线常规体，紧凑排版
-\renewcommand{\cftsubsecfont}{\rmfamily\fontsize{9}{13}\selectfont\color{opink!85}}
-\renewcommand{\cftsubsecpagefont}{\sffamily\fontsize{8}{13}\selectfont\color{opmuted!85}}
+\renewcommand{\cftsubsecfont}{\rmfamily\fontsize{8.2}{10.7}\selectfont\color{opink!82!opmuted}}
+\renewcommand{\cftsubsecpagefont}{\rmfamily\fontsize{7.4}{10.7}\selectfont\color{opmuted!85}}
 \renewcommand{\cftsubsecleader}{\hfill}
-\setlength{\cftbeforesubsecskip}{0.2em}
+\renewcommand{\cftsubsecpresnum}{\color{opmuted}}
+\renewcommand{\cftsubsecaftersnum}{\color{opink!82!opmuted}}
+\setlength{\cftbeforesubsecskip}{0.05em}
 \setlength{\cftsubsecindent}{1.5em}
+\setlength{\cftsubsecnumwidth}{2.1em}
 
 %% ---------------------------------------------------------------- 杂项
 % 分隔线（替代 markdown 的 ---）
