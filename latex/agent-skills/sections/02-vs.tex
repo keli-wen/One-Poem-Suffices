@@ -1,0 +1,108 @@
+% ---------------------------------------------------------------- Section 2
+\section{Skill vs Prompt / MCP / Subagent / Memory}
+
+把 Skills 和相关概念放在一起比较，区别其实很清晰：它们要么是不同类型的 Context，要么是不同的取用方式。Anthropic 在 \weblink{https://claude.com/blog/skills-explained}{Skills Explained} 里给过一张完整的对比表格，下面我从自己的视角补充一些理解。
+
+\subsection{vs Prompt / CLAUDE.md / AGENTS.md}
+
+Prompt、\code{CLAUDE.md}、\code{AGENTS.md} 和 Skill 都在告诉 Agent “怎么做”（更偏指导性上下文），区别主要在\textbf{什么时候加载}：
+
+\begin{optable}
+\begin{tabularx}{\linewidth}{@{}ll>{\raggedright\arraybackslash}X@{}}
+\toprule
+\tabhead{机制} & \tabhead{加载时机} & \tabhead{典型场景} \\
+\midrule
+Prompt & 当前对话内输入 & 一次性请求、临场修正 \\
+\code{CLAUDE.md} / \code{AGENTS.md} & 进入项目即全量加载 & 项目结构、测试命令、代码风格、禁止事项 \\
+Skill & 任务语义命中才加载 & 发布检查、数据库 migration、按公司格式生成评审文档 \\
+\bottomrule
+\end{tabularx}
+\end{optable}
+
+\begin{blockquote}
+如果你发现自己在不同对话里反复输入同一段 Prompt，那就把它做成一个 Skill。\textit{“If you find yourself typing the same prompt repeatedly across conversations, create a Skill instead.”}
+\end{blockquote}
+
+如果你发现在完成一类任务时需要输入同一段指令 5 次以上，那这段指令就应该被持久化为\textbf{知识}。但有进一步的问题需要思考：\textbf{到底是写成 Skill，还是更新到 \code{CLAUDE.md}？}
+
+区别在这段 Context 的\textbf{作用域}。\code{CLAUDE.md} 是项目级的，每次对话都全量常驻 System Prompt，适合放“永远成立”的规则（项目结构、测试命令、代码风格）。而反复出现的指令往往只在\textbf{某一类任务}里才需要，这种任务级的知识写成 Skill，让它语义命中才加载，不占无关对话的注意力预算。
+
+如果用 Push / Pull 的范式进行解释：Prompt 和 \code{CLAUDE.md} 都是 \textbf{Push}（人类主动塞进去），Skill 是 \textbf{Pull}（Agent 判断需要时才加载）。三者不互斥，按加载时机自然分层。
+
+\subsection{vs MCP}
+
+“MCP 和 Skill 有什么区别？”“有了 Skill 是不是就不需要 MCP 了？”这两个问题我见过很多次，但它们本身就问偏了：两者是兼容且互补的，都在扩展 Agent，只是扩展的方向不同。
+
+Anthropic 的 \weblink{https://claude.com/blog/extending-claude-capabilities-with-skills-mcp-servers}{Extending Claude with Skills and MCP} 博客里有一个厨房类比：\textbf{MCP 像一间装备齐全的厨房}，灶台、刀具、食材、冷柜，对应外部系统、数据库、文件、业务 API；\textbf{Skill 像一份菜谱}，告诉你先做什么、火候多少、什么时候下料。\textbf{模型}则是站在中间的厨师：厨房给它原料和工具，菜谱给它流程，它负责判断和临场发挥。
+
+两者的关系可以表述为：\textbf{“MCP provides connectivity; skills provide expertise.”}前者解决“能不能拿到”，后者解决“知不知道怎么用”。例如你想让 AI 帮你投资：MCP 让 Agent 接入你的账户，获取持仓信息、执行交易操作；Skills 负责指导决策流程，例如给你的 Agent 接入一个巴菲特 Skill。
+
+而且两者是\textbf{多对多}的关系：一个财务分析 Skill 可以同时编排好几个数据源 MCP（行情一个、财报一个、研报一个），一个 GitHub MCP 也可以被 Code Review、Issue 分类、Release 等多个 Skill 复用。两个生态互相增强，而非互相替代。
+
+\begin{center}
+  \includegraphics[width=0.8\linewidth]{assets/agent-skills-skills-mcp-skills-mcp-diagram.png}
+\end{center}
+
+从 Context 的角度看：MCP 提供的基本全是\textbf{行动性上下文}：工具定义、工具结果，加上把外部数据搬进窗口的通道（严格说 MCP 规范里还有 \code{prompts} 和 \code{resources} 两类原语，但生态的重心在 \code{tools}，这里按主流用法讨论）。Skill 文件夹里装载三类上下文（见 1.4 节），但它的重心是\textbf{指导性上下文}：“拿到数据之后该怎么处理”，两者之中只有 Skill 在负责这件事。所以可以说：MCP 决定 Agent 能调用什么，Skill 决定它知道怎么用。两者不在同一层，是互补的。
+
+\subsection{vs Subagent}
+
+Subagent 和 Skill 其实不在一个层面上，不太能直接比较。Subagent 是一种\textbf{架构机制}：它有独立的 Context Window、独立的工具权限，主 Agent 把一块任务连同 Handoff 上下文交给它，只取回最后结论。它有很多效果，包括改变复杂任务执行的拓扑结构，实现更高级的智能体系统编排；scaling 更多 tokens 做子任务的 verification；以及上下文隔离，把复杂信息流隔离出去，别污染主上下文（\weblink{https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/context-engineering/}{Context Engineering，一篇就够了}中的 \textbf{Isolate}）。而 Skill 是一层\textbf{可复用的专业知识}，它本身不负责隔离任务流，只负责“这件事该怎么做”。
+
+那它们怎么联系起来？我个人觉得关键在编排 Subagent 时的一个必要环节：\textbf{每次派生 Subagent，都要给它足够的 Handoff 上下文}，包括任务背景、工具用法和流程规范。当你的 Agent 反复为\textbf{同类任务}派生 Subagent 时，这些上下文在不同 delegation 之间高度重复，同一套东西一遍遍重讲。（例如我之前每次 spawn 新的 Subagent 时，都需要显式要求它基于任务类型按我的规范做进度记录，特别麻烦）
+
+\begin{center}
+  \includegraphics[width=0.9\linewidth]{assets/subagent-delegation-with-skill_claude.png}
+\end{center}
+
+Skill 正好补上这一环。把这套重复的上下文和工具用法沉淀成一个 Skill，Subagent 派生时不必每次重新拼装，语义命中就加载。Anthropic 也在博客中推荐了 Subagent 和 Skills 的组合。例如，在我自己的项目中，如果是数据库实现任务，Orchestrator Agent 会基于我的 \code{my-work} Skill（为了方便理解，这里改了下名字）设计 verify checklist，要求另一个 Agent 最后用 \weblink{https://github.com/supabase/agent-skills/tree/main/skills/supabase-postgres-best-practices}{supabase-postgres-best-practices Skill} 做 Review。如果是前端相关任务，则会自动要求用 \weblink{https://github.com/vercel-labs/agent-skills/blob/main/skills/react-best-practices/SKILL.md}{react-best-practices Skill} 做 Review。整个流程很自然，也可以进一步配合 Hooks。
+
+\begin{blockquote}
+在 Claude Code 和 Agent SDK 中，Subagent 可以访问并使用 Skills：让专精分工的 Subagent 带上可携带的专业知识，是非常强的组合。\textit{“In Claude Code and the Agent SDK, subagents can access and use Skills, creating powerful combinations where specialized subagents leverage portable expertise.”}
+\end{blockquote}
+
+再举一个更通俗的例子，你让 Agent 帮你做一份竞品分析报告。主 Agent 派一个 Subagent 专门负责数据收集和分析，这个 Subagent 加载 \code{competitive-analysis} Skill（里面定义了分析框架：先看定位、再比功能、再看定价，最后给一页优劣势对比），在隔离窗口里跑完流程，主 Agent 只接收最终的分析结论和关键数据。如果切换为 Deep Research 任务，你只需要去 GitHub 上下载一个 \code{deep-research} Skill 替换 \code{competitive-analysis}。
+
+\textbf{所以我更倾向认为，“Skill 化的 Subagent”会是更自然的编排范式}：Subagent 提供隔离的执行环境，Skill 提供可复用的专业流程，编排时不再靠 Agent 基于 Session 构建一堆重复 Context，而是让 Subagent 按需加载该用的 Skill。（有点像现代公司里的交接模式～ 当然，向人类组织对齐未必就是 Agent 的最佳实践）
+
+\subsection{vs Memory}
+
+还有一个值得思考的对比，Memory 也是跨会话的，它和 Skill 是什么关系？基于 Context 的视角，两者都是跨会话持久化的 Context，没有本质区别。Memory 系统基于不同的提取偏好（事实或者流程知识）可以得到不同类型的 Memory Context。这里我以 Claude Code 中的 Memory 实现为例：\textbf{Memory 是 Agent 自动更新的、关于你和你的项目的零散事实与偏好；Skill 则是人主导更新的、关于某类任务该怎么做的程序性知识。}这个定义可能在之后不完全准确。下面结合社区整理的非官方 Claude Code 源码镜像，把我观察到的几点写下来。
+
+\begin{infobox}[可跳过的深水区]
+接下来几段是基于“非官方”源码、对 Claude Code Memory 读写机制的拆解。如果你只关心 Memory 和 Skills 的差异结论，可以直接跳到下方\textbf{差异主要在三个地方}，不影响后续阅读。就当是一次渐进式披露：这里是 reference file。
+\end{infobox}
+
+在读取方式上，Memory 和 Skills 都是按需读取那套。我基于 Claude Code auto-memory 的机制制作了如下图片。其中上半部分是 Memory 的更新，下半部分则是读取。
+
+\opfig[0.94]{assets/memory-mechanism-loop_claude-v2.png}{Claude Code 中的 auto-memory 机制}
+
+Memory 的写入 Pipeline 是全自动的。如果当前是主会话且开启了 Memory，后台会根据阈值设置（默认每轮对话后）Fork 一个继承主模型的 Subagent（继承是为了共享 Prompt Cache）。Subagent 会被要求重点分析最近一轮的对话，并与已有记忆进行\textbf{比对}：\textbf{如果发现有价值的持久化信号，它会通过新建、修改覆盖（Upsert）或删除已有文件的方式更新 \code{memory/} 目录及 \code{MEMORY.md} 索引}。注意，这里的比对和 Skills 的加载以及下文中的 Memory 加载范式是一样的，Subagent 会先扫描所有记忆条目的 header（名字和描述）确认是要更新还是新建，如果需要更新则会继续读取该记忆条目的完整内容。
+
+读取 Pipeline 也是常驻后台的（当开启了相关 feature）：每当有用户的对话 Request 到来时，一个旁路小模型（代码里是获取 sonnet 但限制 256 tokens 的输出）读取所有\textbf{未被读取}的 Memory 文件的 Header（和 Skills 一样，每条记忆的名字 + 描述），从中挑出至多 5 条，将完整内容拼接为 Memory Context，在推理开始前注入当轮对话。
+
+其中 \code{MEMORY.md} 是类似 \code{CLAUDE.md} 的记忆索引，可以理解为整个记忆库的目录。在 Memory 的读写 pipeline 中它都提供索引作用（符合 Just-in-Time 的原则）。\code{MEMORY.md} 是常驻上下文的。因此，\textbf{它同样服务于主 Agent，当 Memory 读取 pipeline 没有正确的匹配到可能需要的记忆时，主 Agent 可以直接基于 \code{MEMORY.md} 使用 tool call 把希望阅读的记忆读取到上下文中}。
+
+对比两者，Skills 的 metadata 层和 Memory 文件的 header 格式基本一致，\code{SKILL.md} 的主体则对应每个 Memory 文件的具体内容。
+
+那差异主要在三个地方：
+
+\begin{itemize}
+  \item \textbf{Context 的类型}：Claude Code 把 Memory 限定为四类（user / feedback / project / reference），基本都是信息和偏好（信息性上下文），源码注释还专门要求只存无法从项目状态推导的东西；Skills 装的更多是程序性知识（指导性上下文）。
+  \item \textbf{构建/加载机制}：Memory 的构建由后台 Subagent 周期性“无监督”提取，把关的是 Agent 而非人类；Skills 大多由人构造，经过人的审核。至于加载层面，两者都符合 Just-in-Time Context 的加载逻辑，但召回的决策者有差别：Skill 由主模型自己看 \code{description} 决定加载，Memory 的加载则通常发生在主上下文之外，由旁路模型代为决策。
+  \item \textbf{作用域}：Memory 存储项目相关的信息性上下文，通常和项目强绑定。Skills 中的 Context 则更偏向可分享，可迁移。
+\end{itemize}
+
+但我个人觉得，如果从 Context 的角度，它们两者区分的边界可以很模糊。一条“提交代码前先跑代码格式检查”的 feedback memory，和 Skill 里的一条规则可以一模一样，只是从加载与更新机制的角度它们会有更多区别。就我个人而言，我的 \code{autoMemoryEnabled} 至今是 false：自动生成、无人筛选的记忆会浪费 tokens，偶尔还对解决问题有副作用。关于 Memory 与 Skills 在持续学习领域的思考放在 Appendix C 中。
+
+\subsection{小结}
+
+\begin{center}
+  \includegraphics[width=0.82\linewidth]{assets/skill-agent-architecture-overview_gemini_v2.png}
+\end{center}
+
+那如此多的概念如何联系在一起？其实其中大部分概念都由 Anthropic 提出，我理解他们的 vision 是\textbf{未来所有的解决方案都应该是 General Agent OS (Claude Code like) + Agent Skills + MCP}。
+
+他们认为给 Agent 加一个新领域的能力，往往就是两件事：配好该用的 MCP，装好该用的 Skills。他们自己也确实在按这个叙事推出行业方案：生命科学方向的 \weblink{https://github.com/anthropics/life-sciences}{life-sciences}（repo 建于 Skills 发布次日，配合 Claude for Life Sciences 上线）和金融方向的 \weblink{https://github.com/anthropics/financial-services}{financial-services}，每个\textbf{“产品”}就是打包好的一组 MCP 加一组 Skills，外加少量 Agent 定义。
+
+简单总结：Prompt 和 \code{CLAUDE.md} 是人主动塞给模型的 Context；MCP 负责连接外部世界；Subagent 负责把复杂任务拆出去、隔离上下文。Skill 的特别之处是把两件事一起做了：\textbf{既装着程序性知识，又自带按需加载的取用方式}。

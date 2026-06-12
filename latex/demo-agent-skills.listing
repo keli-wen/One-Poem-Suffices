@@ -1,0 +1,11 @@
+---
+name: blog-review
+description: Review blog drafts for style violations.
+  Use when asked to "review my blog" or "check draft".
+---
+
+# Blog Review
+
+1. Read the draft and the style guide in references/.
+2. Flag banned patterns; suggest rewrites in place.
+3. Output a prioritized list of findings.

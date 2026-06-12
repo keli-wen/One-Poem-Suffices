@@ -1,0 +1,21 @@
+% ---------------------------------------------------------------- Section 5
+\section{The End}
+
+当前的 Skills 看起来很简洁，但我认为未来的复杂度会持续上升：今天几分钟就能写完的 Skill，未来可能需要几周来构建和维护。听过一种声音：Skills 是未来的软件。
+
+Skill 越复杂，越依赖 JIT/Pull 机制才能不撑爆 Context。当然，Skills 也有自己的局限：\weblink{https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/context-engineering/}{Context Engineering 篇}提到的四类上下文失效模式（污染、干扰、混淆、冲突）在 Skills 上同样成立。我也会思考模型和 Skills 在互相进化过程中的冲突问题（自我淘汰），以及 Skills 是否会是发展周期中的临时产物。一个精心打磨的 Skill 在下一代模型出来后可能变成无用乃至副作用的上下文（The Bitter Lesson，人为的设定反而偏离了最优路径），所以前文提到的评估体系在这种场景下会非常重要。目前我认为 Skills 还处于野蛮生长的周期。
+
+回到文章开始的两个观点：\textbf{Skills 本质是 Context，Delivery 机制是 JIT Context / Pull}。Skills 解决的不只是模型缺什么知识，\textbf{还有知识如何在正确的时机、以正确的粒度提供给模型的工程问题}。程序性知识从来不缺（文档里有、人脑里有、训练数据里也有），缺的是让它按需到位的机制/规范。基于这个机制，我们再设计这类知识的 packing 规范，即 Skills。
+
+其实从 Context Engineering 到 JIT Context 再到 Agent Skills，一直有一条主线：\textbf{Context is everything}。MCP 让 Agent 能连接更多上下文，JIT 让它学会按需消耗注意力预算（上下文窗口），Skills 让程序性知识（Context）变得可复用、可分发。
+
+Skills 逐步解决了\textbf{怎么做好}的问题，但 2026 年的主题属于 Long-horizon Agent：怎么让 Agent 一直做下去，持续提供生产力，变为 Agent Workforce。任务拆解、状态恢复、Skill / MCP / Subagent 的编排、针对长程任务的上下文工程，这些属于 Agent Harness，也是我下一篇博客《Agent Harness，一篇就够了》的主题（\weblink{https://keli-wen.github.io/One-Poem-Suffices/zen-of-harness-engineering/claudecode-distillation-practice/}{Claude Code 源码蒸馏}里有一些前期实践）。在那一篇里我也想展开一个判断：优秀的 Automation 本质上是真实的劳动，它在你不在场时持续产出。\textbf{有点像纳瓦尔宝典里的描述，除了原来的三种杠杆（劳动力、资本、边际复制成本为零的产品）外多了一层 Agent Workforce 的杠杆}。
+
+\weblink{https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/just-in-time-context/}{JIT Context 篇}的结尾中我提到过：\textbf{Agent 的能力边界，取决于你的思维边界}。最后简单分享我关于 Skills 的一些小思考：
+
+\begin{itemize}
+  \item 第一，Agent 的 Action Space 太大了，Skills 的核心价值之一是\textbf{控制与对齐}：让 Agent 的行为收敛到你真正想要的方向上，而不是在无约束的空间里随机探索。Skills 是为 Agent 注入你的品味。
+  \item 第二，真正需要\textbf{你}来定义和优化的，可能更多是\textbf{定义问题的 Skills，而非解决问题的 Skills}。解决问题的知识通常是通用的（各类 best practice），而定义问题和你的场景深度绑定：如何把一个模糊的需求拆解成 Agent 可以独立完成的任务描述，这才是生产力的瓶颈。
+\end{itemize}
+
+欢迎交流，也欢迎指正。

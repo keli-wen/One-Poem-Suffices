@@ -1,0 +1,77 @@
+% ---------------------------------------------------------------- Section 1
+\section{What is a Skill?}
+
+引言中我先给出了两个观点：Skills 本质是 Context，取用方式是 JIT/Pull。我们先从\textbf{是什么}出发，解释其具体的格式和机制长什么样。
+
+\subsection{格式：一个文件夹}
+
+Anthropic 对 Skill 的定义很简单：
+
+\begin{blockquote}
+Skills 是一组组织好的文件，为 Agent 打包可组合的程序性知识。换句话说，它们就是文件夹。这份简单是刻意设计的。\textit{“Skills are organized collections of files that package composable procedural knowledge for agents. In other words, they're folders. This simplicity is deliberate.”}
+\end{blockquote}
+
+文件夹可以被人阅读、被 Git 管理、被团队分享，也能被 Agent 用 \code{Read} / \code{Bash} / 文件系统原语操作。任何人都可以在电脑上建一个文件夹，写一个 \code{SKILL.md}，然后所见即所得地迭代。这对于更多的 No-Tech 用户非常友好。
+
+\begin{center}
+  \includegraphics[width=0.94\linewidth]{assets/skill-folder-context-semantics-gpt.png}
+\end{center}
+
+这张 GPT 画的图展示了 Skill 核心的结构与设计：\textbf{只有少量 metadata 常驻上下文，作为 trigger 让 Agent 决定要不要进一步加载；其余所有内容都留在文件夹里，由 Agent 按需自行拉取。}三层结构对应的 token 量级：
+
+\begin{itemize}
+  \item \textbf{第一层 metadata}（\code{name} + \code{description}）：约 \textbf{100 token}，启动时预加载进 System Prompt
+  \item \textbf{第二层 \code{SKILL.md} 正文}：Anthropic 建议控制在 \textbf{500 lines / 5,000 token 以内}，被触发后才读
+  \item \textbf{第三层 bundled files}（\code{references/}、\code{scripts/}、\code{assets/}）：\textbf{无上限}，按路径按需打开
+\end{itemize}
+
+\begin{tipbox}
+我与一些朋友交流时发现，很多人不知道 Skills 的 metadata 会常驻 System Prompt，就像不知道 MCP 也会把 Tools 的定义注入上下文。如果忽略概念的包装，把两者都理解成 Context，那它们出现在上下文窗口里就是自然的事。
+
+也因此，Skills 并不是越多越好。Anthropic 给的参考线是：同时启用的 Skills 到了 20-50 个，就该重新评估和取舍；常见的做法是合并同类 Skill，把具体内容下放到 \code{references/}，交给渐进式披露。或者走 \weblink{https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool}{Tool Search Tool 的范式}。
+\end{tipbox}
+
+\subsection{Skills 的核心机制}
+
+Skills 的核心机制和 JIT Context 一致：\textbf{引用即上下文 + 渐进式披露}。这里重述下 JIT 博客中的一些结论：理解这套机制有一个前提：\textbf{上下文是边际效益递减的有限资源}。上下文窗口里的 token 越多，模型从中提取准确信息的能力越弱（\weblink{https://research.trychroma.com/context-rot}{context rot}），而 Agent 架构天然比普通对话消耗更多 token（Anthropic 的数据是 \weblink{https://www.anthropic.com/engineering/multi-agent-research-system}{4 倍以上}）。所以\textbf{管理好上下文窗口，就是在管理 Agent 的推理质量}。
+
+\weblink{https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices}{Agent Skills Best Practices} 里有一句话：\textbf{“The context window is a public good.”}上下文窗口要同时容纳 System Prompt、对话历史、工具结果、其他 Skill metadata 和当前任务材料。Skill 的三层结构就是在管理这份公共资源：第一层 metadata 做触发判断（这个任务需不需要我？），第二层 body 给流程和指令（具体该怎么做？），第三层 \code{references/} / \code{scripts/} 提供细节和执行力（遇到具体问题去哪查、用什么工具？）。Agent 逐层深入，每一层只在需要时才加载，不浪费注意力预算。
+
+\subsection{为什么 Skills 需要 scripts/？}
+
+\code{scripts/} 是 Skill 可选的组件。大多数 Skill 一开始\textbf{不需要}它（也没有它），只写 \code{SKILL.md} 和 \code{references/} 已经够用。\code{scripts/} 是 Skill 的\textbf{上限}，不是入门门槛。
+
+\textbf{什么时候该把写给模型看的指令，换成给模型跑的脚本？}很简单：\textbf{当某个动作和语义理解无关、需要 100\% 可复现时。}Anthropic 举过一个例子：Claude 总在幻灯片任务里反复写同一段 styling Python，后来他们让 Claude 把它保存进 Skill，作为给未来自己的工具。\textbf{重复、稳定、可验证的动作，就该从语言解释变成可执行的 script。}
+
+\code{scripts/} 本质上就是 Tools（Anthropic 的原话也是 “scripts as tools”）。而工具对模型来说一直都是 Context：模型并不真的“执行”任何东西，它看到工具的定义（绝大部分 Harness 在创建新 Session 时会把工具定义注入上下文），吐出一行调用，再等结果以 token 回来，执行发生在模型之外的 Harness 里。所以引言说“Skills 本质是 Context”是把 \code{scripts/} 算在内的：它就是行动性上下文，只是定义放进了文件系统。这带来两个传统 Tools 没有的性质。其一，\textbf{定义可读可改}：传统 Tool 的描述（docstring）写得再含糊，模型也只能将就着用；script 是文件，代码本身就是最准确的定义，模型必要时可以直接读源码并做改动，不用时则安静地待在文件系统里。其二，\textbf{它不承诺可执行}：script 只提供“这里有个工具、这么用”的上下文，真跑起来缺依赖、环境不对，都要 Agent 自己当场解决（\weblink{https://agentskills.io/specification\#frontmatter}{frontmatter} 的 \code{compatibility} 字段就是用来提前声明环境要求的）。
+
+\opfig[0.94]{assets/equipping-agents-skill-file-structure.jpg}{Skill 的 metadata 挂在 agent 配置中，文件夹内容则活在 agent 虚拟机的文件系统里，与 Bash / Python / Node 运行时为邻；MCP server 在远端。Source: \weblink{https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills}{Equipping agents for the real world with Agent Skills}}
+
+第二个收益是\textbf{省 token}。当 Agent 读一个 reference，是把内容按需拉进上下文窗口；而跑一个 script，效果上和派一个 Subagent 类似（把 Subagent 理解成一个 Agentic Tool 即可），起到了\textbf{上下文隔离}的作用。脚本本体、它处理的数据、中间过程，全都隔离在“珍贵的主上下文窗口”外，窗口里只剩一行调用和一行结果（当然有时候可能有很多日志信息）。举个不恰当的例子：让模型用 generation tokens 一行一行吐出 1MB CSV 的排序结果，既慢又贵；一行 \code{sort} 就够了。如果说渐进式披露对注意力预算的控制是“按需读取”，\code{scripts/} 就是更进一步的“根本不用读”：把复杂、耗 token 的流程直接 tool 化，省掉不必要的注意力消耗。
+
+\textbf{\code{scripts/} 和 MCP 有什么区别？}
+
+两者都是行动性上下文，但分工不同。MCP 解决\textbf{连接}：把外部系统（数据库、SaaS、内部服务）用标准协议接进来，工具由 server 托管，连上了就能用。\code{scripts/} 解决\textbf{流程内的确定性}：它从属于 Skill 所描述的那套流程，把其中重复、脆弱、和语义理解无关的环节固化成代码，换来稳定性和 token 效率；它通常不连接任何外部系统，就在本地跑，跑不起来也没有人兜底，要 Agent 自己修环境。所以常见的组合是 \textbf{MCP 拿数据 $\to$ \code{scripts/} 清洗渲染 $\to$ 模型基于 Skill 的领域知识判断总结}：连接交给协议，确定性交给脚本，判断留给模型。详见 \weblink{https://claude.com/blog/extending-claude-capabilities-with-skills-mcp-servers}{Extending Claude with Skills and MCP}。
+
+另外，\code{scripts/} 也是 Skill 对部署唯一提出要求的部分：纯 Context 的 Skill，任何能读文件的 Agent 都能用；带上脚本，就需要一个干净的 Sandbox。在涉及部署时需要做 Agent Framework 两种流派的取舍，具体内容见 Appendix B。
+
+\subsection{如何为 Skills 分类？}
+
+既然 Skills 本质是 Context，那分类也可以从 Context 的视角来看。一个 Skill 文件夹里其实混合了三种上下文（对应 \weblink{https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/context-engineering/}{Context Engineering 篇的上下文三分类}）：
+
+\begin{itemize}
+  \item \textbf{指导性上下文}：\code{SKILL.md} 里的流程规范、质量标准、判断原则，告诉模型“该怎么做”
+  \item \textbf{信息性上下文}：\code{references/} 里的参考资料、模板、数据，告诉模型“需要知道什么”
+  \item \textbf{行动性上下文}：\code{scripts/} 里的可执行代码，告诉模型“可以跑什么”
+\end{itemize}
+
+这个对应关系只是典型印象，不是硬性规定。\code{references/} 里完全可以放一份风格规范（指导性），\code{SKILL.md} 里也少不了背景信息（信息性）。这里主要侧重说明的是 Skills 可以包括各类上下文。不同 Skill 侧重不同。一个品牌设计 Skill 可能只有指导性上下文（配色规范、字体要求）；一个 PDF Skill 三类都有（流程 + 参考文档 + Python 脚本）。
+
+Anthropic 还提供了另一个互补的分类视角，从\textbf{行为目的}和\textbf{知识来源}两个维度来看（来自 \weblink{https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills}{Improving skill-creator} 和 \weblink{https://youtu.be/CEvIs9y1uog}{AI Engineer talk}）：
+
+\begin{itemize}
+  \item \textbf{行为目的}：区分 Skills 是在\textbf{补模型做不稳的能力}（Capability Uplift，例如 PDF 解析、Office 文档处理），还是在\textbf{固化流程和偏好}（Encoded Preference，例如 PR Review checklist、周报格式、commit message 约定）。
+  \item \textbf{知识来源}：区分 Skills 是\textbf{平台方提供的通用能力}（Anthropic 官方的 \code{pdf} / \code{docx} 等 Skill），\textbf{第三方产品的最佳实践}（Vercel / Supabase 等把自家 API 用法封装成 Skill），还是\textbf{你自己 / 团队 / 组织的工作方式}（Coding Harness 偏好、团队 PR 模板、内部审查流程）。
+\end{itemize}
+
+个人觉得“行为目的”这个分类视角挺好，目前对我效率提升最高的，仍是固化流程和偏好这一类 Skills。

@@ -1,0 +1,46 @@
+% ---------------------------------------------------------------- 引言
+Agent Skills（下文简称 Skills）无疑是 2025 年末到现在最热门的话题之一。我其实很早就写了篇草稿，但当时缺少实践经验，写出来流于解释。这段时间工程师圈子里更热的话题是 Harness Engineering，我借着这类工程实践积累了一些 Skills 实操的 insights，回头把这篇重写了几遍，希望能提供一些理解 Agent Skills 的不同视角。
+
+从格式标准上看，Skills 很简单：一个文件夹，一个 \code{SKILL.md}，再加可选的脚本和参考资料。它不像一个新的 Agent Framework，也不像 MCP 那样标准化外部能力的接入，更像一种可以被不同 Agent Harness 读取的轻量 packaging（参考 \weblink{https://github.com/agentskills/agentskills/tree/main/skills-ref/src/skills_ref}{agentskills/skills-ref} 和 \weblink{https://agentskills.io/specification}{Agent Skills Specification}）。但围绕它的讨论热度一直在发酵：有一段时间 GitHub Trending 上频繁出现 Skills / agent-guideline 类的 repo，例如 \weblink{https://github.com/multica-ai/andrej-karpathy-skills}{\code{andrej-karpathy-skills}} 已经超过 150k stars。
+
+\begin{center}
+  \includegraphics[width=0.92\linewidth]{assets/agent-skills-equipping-agents-skill-metadata.jpg}
+\end{center}
+
+\textbf{“Skills 真的这么有用吗？”}这是我最初读相关文章时反复问自己的问题，毕竟它的设计实在太简单。但现在，我绝大部分任务都有项目级和个人级的 Skills 来降低\textbf{控制 / 对齐}成本：让 Agent follow 我设计好的流程，让模型的输出风格和内容对齐我的偏好。从 \weblink{https://www.cs.utexas.edu/~eunsol/courses/data/bitter_lesson.pdf}{The Bitter Lesson} 的长期视角看，把人类知识硬编码进 AI 系统往往不是最可扩展的路线；但在具体的任务工程里，我们要的不是推进通用智能的边界，而是把任务高效做完，把自己的\textbf{思考预算}留给真正需要品味和判断的环节。Skills 的整个定义也很符合 Anthropic 的工程价值观：\textbf{\textit{Do the simple thing that works}}。
+
+Skills 给 Agent 提供的是什么？Anthropic Skills 团队负责人 Barry Zhang 在 \weblink{https://youtu.be/CEvIs9y1uog}{AI Engineer 的 talk} 中的定义是 “\textbf{\textit{composable procedural knowledge for agents}}”。这里的关键词是\textbf{程序性知识（Procedural Knowledge）}。与事实性知识（知道是什么）不同，程序性知识描述的是 怎么做 以及 怎样算做对。它与具体场景绑定，因此也可以理解为从特定领域蒸馏出的实践经验（Domain Expertise）。
+
+\begin{notebox}[为什么叫 Procedural Knowledge 而不是 Workflow Knowledge 呢？]
+我最早写这篇博客时，凭直觉用的是 Workflow Knowledge。后来想搞清楚 Anthropic 为什么专门要用 Procedural 这个词，去翻了下背景：它来自认知科学，跟 declarative knowledge（“知道什么”）相对，指“知道怎么做”的那一类知识（参见 \weblink{https://en.wikipedia.org/wiki/Procedural_knowledge}{Wikipedia: Procedural knowledge}）。
+
+看完我也接受了这个用法。不是每个 Skill 都是流程：一个只固定配色和字体的品牌设计 Skill，很难称为 Workflow Knowledge。Procedural 的范围更大，简单的“按规范做”和复杂的“按流程做”都能兼容。本文之后统一用 Procedural Knowledge（程序性知识）。
+\end{notebox}
+
+但只到这里，对我而言还有一个困惑没有解开：\textbf{Skills 的本质是什么？}如果只跟着 Anthropic 的官方叙事走，很容易把它解读成“一种 Agent 能力的打包格式”，这篇也会变成多篇 Anthropic 博客的综合解读，那大可不必由我来写（Opus / GPT 可能更适合）。回到第一性原理想这个问题，结合我之前写博客的一些思考，我的理解从两个点出发。
+
+\begin{center}
+  \includegraphics[width=0.62\linewidth]{assets/context-type-definition.png}
+\end{center}
+
+\textbf{第一，Skills 本质上就是 Context。}技术上你完全可以在 Skills 文件夹里放任何类型的上下文。按我在\weblink{https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/context-engineering/}{《Context Engineering，一篇就够了》}里的分类，既可以是指导性上下文，也可以是信息性上下文：事实数据、API 文档、甚至 RAG 索引。所以“提供什么类型的知识”并不是 Skills 最核心的创新，朴素的 Context 文件也可以提供 Procedural Knowledge。
+
+那为什么最佳实践都表明，Procedural Knowledge 特别适合 Skills 这种格式？我的理解是三个原因：（1）它的触发信号是\textbf{任务类型}：模型看到“生成 PDF 报告”就知道该加载 PDF 流程，靠 Skills 的 \code{description} 做文本分类就够了，不需要向量检索。（2）它的内容\textbf{天然有结构}：步骤、工具、引用，可以映射到文件夹层级。（3）它的复用是\textbf{整包、跨会话}的：同一个流程在不同会话、不同人手里都原样适用，每次被取用的都是同一份完整内容，这样打包的 ROI 才够高。举一个反例，常见的 RAG 场景：一份公司内部的产品 FAQ，触发信号是用户提问的语义（更多需要向量检索，而非任务类型分类），内容是扁平的 Q\&A 对，复用的单位是条目而非整包：每次提问只命中其中几条，且次次不同，不存在一个值得整体加载的“流程”。这种 Context 用 RAG 比用 Skill 更合适。
+
+\begin{questionbox}[读到这里可能有一个很直接的问题：\code{scripts/} 是可执行的 tools，怎么能直接说 Skills 就是 Context？]
+我的思考是：第一，我在 Context Engineering 篇把上下文分了三类，除了上面这两类，还有一类\textbf{行动性上下文}：工具的定义和用法本身也是 Context，MCP（Model Context Protocol）就是它的标准化协议，\code{scripts/} 可以看成它的本地版。第二，Skill 从头到尾只负责提供 Context，“能跑”是 Harness/Sandbox 给的能力；把同一个 Skill 放进没有执行环境的 Harness，\code{scripts/} 就退化成一段可以阅读的参考代码。下文的 1.3 节会展开解释。
+\end{questionbox}
+
+\textbf{第二，Skills 的设计体现了 Push $\to$ Pull 的范式转移。}这个判断源自我在写 \weblink{https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/just-in-time-context/}{《Just-in-Time Context，一篇就够了》}时的思考。传统模式下，人类构建检索系统，把自认为模型可能需要的上下文灌进去（Push）；当模型能力越过某个智能阈值，这种\textbf{硬编码}反而成了限制。所以 Anthropic 很早就开始力推 Just-in-Time Context：只给\textbf{引用和目录}，把上下文窗口尽可能留给模型主动的探索（Pull）。Skills 的核心机制，就是 JIT Context 的核心机制：\textbf{引用即上下文（References as Context）}和\textbf{渐进式披露（Progressive Disclosure）}。metadata 常驻 $\to$ body 按需读 $\to$ references 深度探索，正是这个范式的具体实现。
+
+这两点合在一起，才能解释 Skills 为什么长成现在这个样子。所以我的结论会是：\textbf{Agent Skills 是 Just-in-Time Context 的具体实现之一}。后文也会尽量从这两个视角出发，而不是单纯解读官方博客。
+
+基于此，本篇旨在回答三个问题：
+
+\begin{itemize}
+  \item \textbf{What？}Skills 作为一种 JIT Context 的实现，具体的格式和机制是什么？它和 Prompt / MCP / Subagent / Memory 等已有机制有什么区别？
+  \item \textbf{Why？}为什么是现在，为什么是这种形态？通用 Agent 的崛起和 Skills 之间是什么关系？
+  \item \textbf{How？}构建一个好 Skill 的最佳实践是什么？
+\end{itemize}
+
+为了保证正文的阅读流畅性，我把一些延伸讨论放进了附录～ 这篇博客“呕心沥血”，写了好几周，希望大家多多支持～

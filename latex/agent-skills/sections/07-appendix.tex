@@ -1,0 +1,76 @@
+% ---------------------------------------------------------------- Appendices
+\opsectionx{Appendix A}{Skills 的标准化历程}
+
+第 3 节开头称 Skills 是注入程序性知识的标准做法，这里给出一些时间线，以下是关键节点：
+
+\begin{itemize}
+  \item \textbf{2025-10-16}：Anthropic 首发 Agent Skills，作为 Claude.ai / Claude Code / API 三端通用的能力扩展机制
+  \item \textbf{2025-12-12}：OpenAI 被发现静默采纳了同样的 Skills 格式（\weblink{https://simonwillison.net/2025/Dec/12/openai-skills/}{Simon Willison}）
+  \item \textbf{2025-12-18}：Anthropic 将 Agent Skills 作为开放标准发布到 \weblink{https://agentskills.io}{agentskills.io}，同时上线组织级管理和合作伙伴目录
+  \item \textbf{2026-01-29}：发布 The Complete Guide to Building Skills for Claude，将 Skills 作为软件工程对象来对待
+\end{itemize}
+
+三个月内，Skills 从 Claude 的内部能力演化为开放标准（名称本身并不关键，叫 Skills 还是 Flows 都行）。\textbf{核心在于，生态正在向同一套约定收敛。}
+
+参照 function calling 的先例，格式一旦固定，模型训练便有了明确的优化目标，均可针对性强化。我倾向认为模型与 Harness 会围绕这个格式持续 co-evolve。今天写的 Skill，很可能会随着模型对该格式的适配度提升而变得更有效（当然，格式的通用性不能保证内容不过时，所以良好的 Eval pipeline 可以有效地管理 Skills）。\textbf{格式固定与模型进化之间，往往会形成正向循环。}
+
+\opsectionx{Appendix B}{scripts/ 与部署：两种 Agent Framework 的取舍}
+
+1.3 节指出 \code{scripts/} 是 Skill 对部署唯一提出要求的部分，这里具体分析一下。
+
+纯 Context 的 Skill（\code{SKILL.md} + \code{references/}）对环境没有额外要求，任何能读文件的 Agent 都能使用。一旦引入可执行脚本，Agent 就需要一个完备的 Sandbox：隔离环境、脚本依赖、权限边界，均需纳入管理。\textbf{\code{scripts/} 的引入，让 Skill 从一份可供阅读的文档变成了一个需要运行时的程序。}
+
+这背后更多是 Agent Framework 两种流派之间的取舍。Code-based 派（LangGraph、ADK、Camel 等）部署友好，横向扩展成本低；filesystem-based 派（Anthropic Agent SDK、Antigravity SDK 等）开发体验更自然，更适合个人开发者：Bash/文件系统本身就是 Agent 能力的延伸（Agent 和 Harness 本就 co-evolved），但每个 Session 可能都要启动一个独立容器。\textbf{文件系统让 Agent 更自然地扩展能力，但也将 Sandbox 的成本带进了每一次 Session。}如何在云端低成本部署 Sandbox-based Agent，目前仍是一个开放问题。欢迎大家为我解惑。
+
+\opsectionx{Appendix C}{Memory 与 Skills：三类记忆，两种学习范式}
+
+2.4 节提出了几条观察，本节展开其背后的理论依据与技术细节。
+
+\begin{center}
+  \includegraphics[width=0.85\linewidth]{assets/three-types-of-memory.png}
+\end{center}
+
+\textbf{三类记忆与 Skills 的定位}
+
+认知科学将长期记忆大致分为三类：情景记忆（episodic memory，发生过什么）、语义记忆（semantic memory，知道什么）、程序性记忆（procedural memory，会做什么）。Agent 记忆的研究沿用了这套分类，\weblink{https://arxiv.org/abs/2309.02427}{CoALA} 按此三类组织 Agent 的长期记忆，并将程序性记忆进一步区分为两种形态：隐式的，存在模型权重中；显式的，写在 Agent 的代码或结构化的 Context 中。
+
+沿用这一框架，Skills 可以理解为显式程序性记忆的一种标准化载体。引言中的命名考据在此形成呼应：Anthropic 选择 “Procedural” 一词，实际上从起点就将 Skills 定位在程序性记忆的范畴内。CoALA 内还提到一个结论：\textbf{向程序性记忆写入，比写入情景或语义记忆的风险更高，更容易引入 bug 或偏离设计意图}。这一结论与 Appendix D 的实验数据相互印证。
+
+\textbf{从情景记忆到两种学习范式}
+
+对应到 Agent 系统中，情景记忆的原始形态就是 Session 轨迹。但没有人会直接将原始 Session 当作记忆系统使用：信息密度低、噪声高，每次复用都需要重新读取全文。它真正的角色是\textbf{原料}：语义记忆和程序性记忆，是从这份原料中提炼出的两种产物，分别对应两条不同的路线。
+
+\textbf{路线一：全自动提取。}Claude Code 的 auto-memory 在后台 fork 一个 Subagent，按阈值设置（默认每轮对话后）周期性提取对话要点；产物是四类记忆文件，内容偏向\textbf{信息性上下文}。加载环节我在 2.4 节具体提过，这里不是重点（机制图也见 2.4 节）。
+
+\textbf{路线二：Human-in-the-loop 沉淀。}即 3.2 节中的 \code{contexts/} 工作流。人参与筛选哪些经验值得固化，产物是程序性知识，最终落入 Context 文件或 Skill。
+
+\textbf{取舍与展望}
+
+目前我的判断是：全自动路线降低了维护成本，但学习的东西缺乏人工把关，质量存在波动（方向偏离），这是我将 \code{autoMemoryEnabled} 关闭的原因；Human-in-the-loop 的维护成本更高，但每条记忆都经过人的判断与筛选，SkillsBench 的实验（Appendix D）也更倾向于支持这一方向。
+
+往后看，两条路线未必始终对立。自动提取、人工批准的中间形态，也许是更可持续的方向。这里记录的只是 2026 年年中的一个阶段性观察。
+
+\opsectionx{Appendix D}{SkillsBench 的结论}
+
+\weblink{https://www.oreilly.com/radar/agent-skills-work-but-the-research-shows-most-teams-are-building-them-wrong/}{SkillsBench} 的对照实验（84 个任务、11 个领域）提供了几项值得关注的结论。
+
+\begin{center}
+  \includegraphics[width=0.92\linewidth]{assets/skillsbench-evaluation-results.png}
+\end{center}
+
+\begin{optable}
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+\tabhead{发现} & \tabhead{含义} \\
+\midrule
+经人工筛选与精修的 Skill 平均提升 \textbf{16.2\%} & Skill 有用，但\textbf{前提是由人来把关质量} \\
+Healthcare 提升 ${\sim}52\%$，SWE 仅 4.5\% & 模型预训练覆盖越薄弱的领域，Skill 的边际收益越大 \\
+模型自生成的 Skill 提升 \textbf{0\%} & 让模型自己编写 Skill 再自己执行，没有正收益 \\
+小模型 + 精修 Skill $\approx$ 大模型裸跑 & Skill 是一种\textbf{变相的模型能力升级} \\
+\bottomrule
+\end{tabularx}
+\end{optable}
+
+第三行最值得关注。让 Agent 自己编写 Skill，听上去已经接近自我迭代，但实验给出的答案是没有收益。背后的逻辑我认为是：Skill 本质上是对已有知识的程序化封装，而模型在缺乏外部可验证信号时无法从\textbf{自己身上蒸馏出自己尚未掌握的知识}，正如 RLHF 之所以需要 Human，正是因为模型无法可靠地充当自己的裁判。\textbf{在持续学习这条路径上，至少在质量把关这一环，短期内仍然离不开人的判断。}
+
+这也解释了 3.2 节中 \code{contexts/} 工作流为何必须由人来收尾：将预测结果与标准答案进行对比，这件事可以交给 Agent 执行；但\textbf{哪些结论值得更新到 Context 中的判断，仍需由人来决策}。

@@ -1,0 +1,65 @@
+% ---------------------------------------------------------------- References
+\opsectionpillonly{References}
+
+\begingroup\small
+{\color{opclay}\faIcon{fire}} 代表个人更推荐阅读的。
+
+\textbf{Anthropic 官方系列：}
+
+\begin{itemize}[itemsep=0.12em]
+  \item {\color{opclay}\faIcon{fire}} \weblink{https://claude.com/blog/skills}{Introducing Agent Skills} --- Skills 的首发公告（2025-10-16）
+  \item {\color{opclay}\faIcon{fire}} \weblink{https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills}{Equipping agents for the real world with Agent Skills} --- Skills 的设计动机与架构原理
+  \item {\color{opclay}\faIcon{fire}} \weblink{https://claude.com/blog/skills-explained}{Skills Explained: How Skills Compares to Prompts, Projects, MCP, and Subagents} --- Skills 与 Prompt、MCP、Subagent 等五种机制的对比
+  \item {\color{opclay}\faIcon{fire}} \weblink{https://claude.com/blog/extending-claude-capabilities-with-skills-mcp-servers}{Extending Claude's Capabilities with Skills and MCP Servers} --- 如何将 Skills 与 MCP 配合使用
+  \item \weblink{https://claude.com/blog/building-agents-with-skills-equipping-agents-for-specialized-work}{Building Agents with Skills} --- 用 Skills 构建 Agent 的整体架构与生态分类
+  \item \weblink{https://claude.com/blog/how-to-create-skills-key-steps-limitations-and-examples}{How to Create Skills for Claude} --- Skills 的创建流程与示例
+  \item \weblink{https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills}{Improving skill-creator: Test, measure, and refine Agent Skills} --- Skills 的分类方式与迭代优化方向
+  \item {\color{opclay}\faIcon{fire}} \weblink{https://claude.com/blog/improving-frontend-design-through-skills}{Improving Frontend Design through Skills} --- 通过 Skills 解决 AI 生成前端设计趋同问题的案例
+  \item \weblink{https://claude.com/blog/complete-guide-to-building-skills-for-claude}{A Complete Guide to Building Skills for Claude} --- 完整的 Skills 工程实践指南（2026-01-29）
+\end{itemize}
+
+\textbf{官方文档与开放标准：}
+
+\begin{itemize}[itemsep=0.12em]
+  \item {\color{opclay}\faIcon{fire}} \weblink{https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview}{Agent Skills Overview} --- 官方文档入口
+  \item {\color{opclay}\faIcon{fire}} \weblink{https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices}{Skill authoring best practices} --- 编写 Skills 的最佳实践，提出“上下文窗口是公共资源”的观点
+  \item \weblink{https://platform.claude.com/docs/en/build-with-claude/skills-guide}{Using Agent Skills with the API} --- 通过 API 使用 Skills 的开发指南
+  \item {\color{opclay}\faIcon{fire}} \weblink{https://agentskills.io/what-are-skills}{AgentSkills.io: What are skills?} --- Agent Skills 开放标准的最小规范
+  \item \weblink{https://github.com/anthropics/skills}{Anthropic Skills Repository} --- 官方 Skills 仓库，含 pdf、skill-creator、frontend-design 等示例
+\end{itemize}
+
+\textbf{演讲：}
+
+\begin{itemize}[itemsep=0.12em]
+  \item {\color{opclay}\faIcon{fire}} \weblink{https://youtu.be/CEvIs9y1uog}{Don't Build Agents, Build Skills Instead} --- Barry Zhang \& Mahesh Murag @ AI Engineer 2025，Skills 核心设计者的分享
+\end{itemize}
+
+\textbf{社区与外部分析：}
+
+\begin{itemize}[itemsep=0.12em]
+  \item {\color{opclay}\faIcon{fire}} \weblink{https://simonw.substack.com/p/claude-skills-are-awesome-maybe-a}{Claude Skills are awesome, maybe a bigger deal than MCP} --- Simon Willison 对 Skills 的早期深度评测
+  \item {\color{opclay}\faIcon{fire}} \weblink{https://simonwillison.net/2025/Dec/12/openai-skills/}{OpenAI quietly adopted Anthropic's Skills format} --- Simon Willison 发现 OpenAI 静默采纳了 Skills 格式
+  \item {\color{opclay}\faIcon{fire}} \weblink{https://www.oreilly.com/radar/agent-skills-work-but-the-research-shows-most-teams-are-building-them-wrong/}{Agent Skills Work, but the Research Shows Most Teams Are Building Them Wrong} --- O'Reilly Radar 基于 SkillsBench 的实证分析，含对照实验数据
+  \item \weblink{https://www.llamaindex.ai/blog/skills-vs-mcp-tools-for-agents-when-to-use-what}{Skills vs MCP Tools for Agents} --- LlamaIndex 的对比测试，发现 Skills 在某些场景下触发率偏低
+  \item \weblink{https://notes.ansonbiggs.com/youre-probably-using-agent-skills-wrong/}{You're Probably Using Agent Skills Wrong} --- Anson Biggs 对 Skills 常见反模式的尖锐批评
+  \item \weblink{https://lellansin.github.io/2026/01/27/Why-Cursor-Rules-Failed-and-Claude-Skill-Succeeded/}{Why Cursor Rules Failed and Claude Skill Succeeded} --- Lellansin 的中文文章，对比 Cursor Rules 与 Skills 的设计差异
+  \item \weblink{https://github.com/codeaashu/claude-code}{codeaashu/claude-code} --- 社区整理的 Claude Code 源码，本文 2.4 节与附录 C 的 Memory 机制分析参考了该项目
+\end{itemize}
+
+\textbf{学术博客/论文：}
+
+\begin{itemize}[itemsep=0.12em]
+  \item \weblink{https://trinkle23897.github.io/learning-beyond-gradients/}{Learning Beyond Gradients} --- 翁家翌提出的 Heuristic Learning（启发式学习）概念，主张通过代码迭代与回归测试实现持续学习
+  \item \weblink{https://arxiv.org/abs/2309.02427}{CoALA: Cognitive Architectures for Language Agents} --- 将认知科学的三类长期记忆（情景、语义、程序性）引入 Agent 架构设计，本文附录 C 的理论框架来源
+\end{itemize}
+
+\textbf{个人博客系列前篇：}
+
+\begin{itemize}[itemsep=0.12em]
+  \item \weblink{https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/context-engineering/}{Context Engineering，一篇就够了} --- 上下文工程的四个核心操作：编写、筛选、压缩、隔离
+  \item \weblink{https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/just-in-time-context/}{JIT Context，一篇就够了} --- 按需加载上下文的机制：引用即上下文、渐进式披露、注意力预算
+  \item \weblink{https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/model-context-protocol/}{MCP，一篇就够了} --- Model Context Protocol 的设计、原理与使用方式
+  \item \weblink{https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/multi-agent-system/}{Multi-Agent System，一篇就够了} --- 多智能体系统的架构与编排
+  \item \weblink{https://keli-wen.github.io/One-Poem-Suffices/one-poem-suffices/prompt-caching/}{Prompt Caching，一篇就够了} --- Prompt Caching 的原理与实践
+\end{itemize}
+\endgroup

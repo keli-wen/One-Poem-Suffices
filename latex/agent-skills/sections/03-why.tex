@@ -1,0 +1,80 @@
+% ---------------------------------------------------------------- Section 3
+\section{Why do we need Skills?}
+
+前两节回答了 Skills “是什么”。这一节会更强调“为什么”：\textbf{为什么是现在，为什么是这种形态？}
+
+Skills 团队自己讲过一个很形象的类比：报税这件事，你会交给 300 IQ 的数学天才，还是一个经验丰富的税务专家？Barry 说他每次都选后者，没人想让天才从第一性原理现场推导 2025 年的税法。\textbf{今天的 Agent 很像那个天才：聪明，但缺少你所在领域的专业经验。}
+
+目前模型的基础智能越过了阈值，Agent 缺的是\textbf{程序性知识}。程序性知识塞进一段长 Prompt 或 Context 文件，也能起到类似的效果（内容本身从来不是 Skills 的创新）；Skills 解决的是它的工程问题：放在哪里、什么时候被加载、怎么跨会话复用、怎么分发给整个团队。就像人不会背下整个图书馆，靠的是索引和目录。这才是 Skills 和一段普通 Context 之间真正的区别。所以 \textbf{Skills 是 Anthropic 给出的、注入这种知识的标准做法}。Skills 自发布后，很快被 OpenAI 等同行采纳为标准，这也有助于 Skills 和 Agent 共同进化，完整论证放在 Appendix A。
+
+\subsection{通用 Agent 的崛起}
+
+过去大家很自然地认为：不同领域需要不同 Agent。法律 Agent、财务 Agent、科研 Agent，各有自己的工具、System Prompt 和工作流。这个思路看起来合理，因为每个领域的任务差异确实很大。
+
+\begin{center}
+  \includegraphics[width=0.8\linewidth]{assets/building-agents-fig1-before.png}
+\end{center}
+
+但 Anthropic 基于 Claude Code 的经验给出了另一个判断，并且 Codex 随后发扬光大：
+
+\begin{importantbox}[Code is all we need]
+我们过去以为不同领域的 Agent 会长得很不一样，每个都需要自己的工具和脚手架。但\textbf{底层的 Agent 其实比我们想象的更通用}。我们发现，\textbf{代码不只是一个用例，而是通往数字世界的通用接口}。\textit{“We used to think agents in different domains will look very different. Each one will need its own tools and scaffolding... Well, customization is still important for each domain. The agent underneath is actually more universal than we thought. What we realized is that code is not just a use case but the universal interface to the digital world.”}
+\end{importantbox}
+
+一个财务报告任务，表面看和写代码无关。但 Agent 可以通过 Tool call（API 或 MCP）拉数据、用 Python 做分析、用代码生成图表，最后生成报告。如果再加载几个财务相关的 Skills（\weblink{https://github.com/anthropics/financial-services}{financial-services}）和视觉设计相关的 Skills（\weblink{https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md}{skills/frontend-design}），你可以在 30 分钟内拿到一份专业级的 report。
+
+此时限制你的不再是个人时间：只要有足够的 tokens，你可以轻松并行 10 份报告，tokens 直接换算成 workforce。营销方案也类似：从 CRM 抓客户数据、跑分析脚本、生成 slide 和 brief。尽管领域不同，Agent 用的基本工具是同一套：\textbf{终端、文件系统、代码执行，加上几个外部 Tool / API}。我现在的 codebase 里就有大量 Automation 在帮我做各类任务。
+
+\begin{center}
+  \includegraphics[width=0.8\linewidth]{assets/building-agents-fig2-today.png}
+\end{center}
+
+从过去为每个领域精心构建一套 Agent loop，到现在 Coding Agent 涌现出解决各种任务的通用能力，我个人感觉\textbf{关键是在模型基础智能达标后，其 Agentic 能力也迈过门槛}。（反例是 Gemini 3.1 Pro 这个模型，Agent 能力严重拖累模型智能）
+
+Claude Code 首先证明了 Coding Agent 可以承担通用任务（大致从 Opus 4.0 系列开始），我用它写博客、写代码、做调研、购物分析、金融投资。Codex 则更进一步，把 Coding Agent \textbf{显式“改造”成通用工作台}，提供了更多解决 more than code 任务的插件和设计，也比 Claude Desktop 更早长成我心目中通用智能体工作台的样子。我倾向认为 \textbf{General Agent Harness 会越来越热门}，越过 Coding Task 的边界，延伸到任何与认知（Cognition）相关的活动中（推荐观看 \weblink{https://www.youtube.com/results?search_query=aiascent+2026}{AI Ascent 2026}）。
+
+当底层 Agent 足够通用，工程重点自然从\textbf{为每个领域造一个新 Agent}，转向\textbf{给同一个通用 Agent 装上可插拔的专业知识}。这和 Push $\to$ Pull 是同一个趋势：Agent 越通用，越需要一种轻量的方式按需加载领域知识，而不是每次都从零开始教。
+
+\begin{center}
+  \includegraphics[width=0.9\linewidth]{assets/agent-skills-building-agents-fig3-architecture.png}
+\end{center}
+
+\opfig[0.9]{assets/agent-skills-analogy.png}{模型像处理器，Agent Runtime 像操作系统，Skills 是应用层。Source: \weblink{https://claude.com/blog/building-agents-with-skills-equipping-agents-for-specialized-work}{Building agents with Skills}}
+
+\subsection{让 Agent 第 30 天比第 1 天强}
+
+Anthropic 认为 Skills 是\textbf{走向 continuous learning 的一个 concrete step}。这里的 learning 并不是模型参数的更新，指的是让 Claude 写下来的流程、脚本、偏好和失败经验，可以被未来的自己复用。
+
+\begin{blockquote}
+Claude 写下来的任何东西，都能被未来版本的自己高效使用。这让学习真正变得可迁移。\textit{“Anything that Claude writes down can be used efficiently by a future version of itself. This makes the learning actually transferable.”}
+\end{blockquote}
+
+任务执行中积累的失败模式、用户偏好、验证流程，沉淀为结构化的上下文：标准流程写入 \code{SKILL.md}，可复用代码写入 \code{scripts/}，详细文档写入 \code{references/}。下次遇到同类任务，Agent 无需从头探索，直接从已有经验出发。
+
+\begin{center}
+  \includegraphics[width=0.72\linewidth]{assets/externalized-continual-learning.png}
+\end{center}
+
+我的实践之一是在项目中维护 \code{contexts/} 文件夹，将任务拆分为两个阶段：\textbf{Context（探索）}与 \textbf{Execution（执行）}。Context 任务负责探索问题空间并输出 Context 文件（包括必要的实验性工具调用）；通过在探索阶段投入更多 tokens（explore token scaling），为执行阶段构建更精准的 Handoff 上下文，以期找到更优的实现路径。因为执行阶段涉及大量代码变更，试错成本远高于探索阶段。
+
+执行任务完成后，我会在当前 Session 中要求 Agent 对比实际的执行轨迹与 Context 任务制定的计划：哪些地方出现了偏差，哪些经验值得沉淀，从而更新到 \code{contexts/} 和 Skills 中。因为\textbf{它同时产出了 prediction（Context 任务给出的计划）与 ground truth（真实执行轨迹加上用户反馈），构成了一个可学习的样本对}。这与翁家翌（OpenAI）提出的\weblink{https://trinkle23897.github.io/learning-beyond-gradients/}{启发式学习（Heuristic Learning）}有相似之处，区别在于被更新的不是模型参数，而是 Skills 文件或自动化脚本。
+
+基于解决任务的 Session 进行学习，与让 Agent 凭空直接写 Skills 有本质区别：后者没有 ground truth。
+
+\begin{center}
+  \includegraphics[width=0.9\linewidth]{assets/contexts-workflow-loop_claude.png}
+\end{center}
+
+\textbf{为什么 Skills 的更新可以视为持续学习？}
+
+我们把持久化一些结论到 Context 文件的过程视为持续学习，你或许会联想到 2.4 节讨论的 Memory。它是否也构成持续学习？我认为同样可以，两者运行的是相同的回路：Session 中产生信息，后台提取，写入文件，下次注入上下文。从这个角度看，auto-memory 是全自动的持续学习，\code{contexts/} / Skills 工作流则是 human-in-the-loop 的持续学习。差异仍然是 2.4 节归纳的三点，其中我最关注的是\textbf{谁来决定写入的内容}。
+
+对照 RLHF（Reinforcement Learning from Human Feedback，基于人类反馈的强化学习）的框架进行思考。RLHF 的核心流程是：模型产出行为，人给出反馈，反馈转化为奖励信号，更新模型，改善下一次行为。Skills 学习的工作流运行的是相似的流程：一次 Session 对应一次行为，\textbf{计划与实际的偏差，加上我的评价}构成了人类反馈。区别在于更新的机制：RLHF 将反馈蒸馏为 reward model，再去更新权重；而在这套工作流中，反馈由人直接筛选，被更新的是那份描述流程的文件（Skills）。学习的载体从模型权重变成了 Context 文件。这也为 Appendix D 中 SkillsBench 的实验结果（\textbf{模型自写自用，提升接近于零}）提供了一种解释：RLHF 的反馈来源是人，让模型自行编写 Skill 并自行使用，相当于将人从回路中移除。
+
+从形态上看，学习的产物本质上是压缩。一次 Session 的轨迹可达数万至数十万 tokens，合并回 Skill 往往只是几行改动；数十条任务执行的轨迹沉淀下来，可能仅凝结为一份几百行的 \code{SKILL.md}。Context Engineering 篇中引用过 Ilya Sutskever 关于“压缩即智能”的观点，我认为这里是同一个逻辑：将长轨迹压缩为短的启发式结论。
+
+因此 Anthropic 对 Skills for learning 的愿景是：Day 1 的 Claude 只具备通用知识；Day 30 的 Claude 如果能读取沉淀下来的 Skills，则可以了解团队偏好的格式、常用工具链、内部流程，以及容易出问题的环节。它不需要记住一切，关键在于\textbf{在正确的时机取回正确的经验}。因此 Skills 是 Harness Engineering 中不可或缺的一环：通过不断迭代，我构建的 Skills \& Hooks 可以帮助我从零构建起几十万行的项目，并在其中高效并行多个任务，我的思考预算只需要花在少数真正需要深入的问题上（推荐阅读：\weblink{https://openai.com/index/open-source-codex-orchestration-symphony/}{OpenAI - An open-source spec for Codex orchestration: Symphony}）。
+
+\begin{tipbox}
+这也是个人开发者在 Harness Engineering 上需要优化的部分。我目前的经验有两条：在 Harness 设计阶段投入越多，后续开发阶段的效率越高；以及要不断扩展自己效率的边界，尽可能让你的 tokens 并行化（Subagent）、自动化（Automation / Loop）。
+\end{tipbox}

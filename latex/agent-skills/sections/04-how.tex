@@ -1,0 +1,105 @@
+% ---------------------------------------------------------------- Section 4
+\section{How? Best Practices for Building Skills}
+
+怎么写好一个 Skill，Anthropic 自身的教程已经相当完整，推荐阅读 \weblink{https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices}{Best Practices} 和 \weblink{https://claude.com/blog/complete-guide-to-building-skills-for-claude}{Complete Guide} 这两份文档。更 AI-Native 的做法是：将链接直接提供给 Coding Agent，让它据此 Review 你现有的 Skill。
+
+因此本节不复述教程，而是从实践出发，讨论几个我认为值得分享的点。仍沿用本文的两条主线来组织：Skills 本质是 Context，所以先看\textbf{Context 的内容怎么写好}（见 4.1 节）；Delivery 机制是 JIT，再看\textbf{结构和触发怎么设计}（见 4.2 节）；最后是\textbf{如何迭代与验证}（见 4.3 节），以及具体例子的分析（见 4.4 节）。
+
+在进入最佳实践之前，先思考一个前置问题：什么时候值得写 Skill？Anthropic 给出的标准很清晰：\textbf{“这个任务我已经做过 5 次了吗？以后还会再做 10 次吗？”}（\textit{“Have I done this task at least five times? Will I do it at least ten more times?”}）两个问题都回答是，才值得投入时间。
+
+我自己的标准更偏向 \textbf{Learn by doing，按需沉淀}。对于明显重复的流程，我会先将其提炼为 Skill，在后续同类场景中直接复用。初版通常难以一步到位，因此我会结合 Session 的实际表现进行迭代（即 3.2 节中提到的流程），一般经过两到三轮调整后，Agent with Skills 的表现趋于稳定。官方推荐的起步方式 \textbf{Iterate-on-one-task} 也是同一个思路：先在一个有难度的任务上把单次 Prompt 调通，再将验证有效的指令提炼为 Skill。共同的前提是先有一条成功的轨迹，提炼发生在轨迹之后，而不是凭空设计。
+
+\subsection{怎么写一个好的 Context}
+
+既然 Skills 本质是 Context，那\textbf{怎么写好一个 Skill} 的前半个答案，就在于一份\textbf{怎么写一个好的 Context}。我将其归纳为两个层面：
+
+\begin{itemize}
+  \item \textbf{内容层面：已知的不写，未知的写清楚，与当前任务无关的不掺入。}
+  \item \textbf{管理层面：保持单一事实来源（Single Source of Truth），维护 Context 文件之间的一致性。}
+\end{itemize}
+
+这两条经验均来自与 Agent 协作过程中的教训。内容层面的问题尤为常见：Agent 在生成和更新 Context 时倾向于填充冗余信息，偶尔还会将 Session 中的任务特定内容混入通用文件。而且，它倾向于将 Context 写成\textbf{错题本}式的特例集合，而非可迁移的启发式结论，本质上是一种 hardcoding，相当脆弱。管理层面的问题同样常见：与写代码时类似，Agent 不擅长抽象和归并：同一个结论容易散落在多个文件中，后续更新遗漏一两处，下游 Agent 读到相互矛盾的版本，推理质量随之下降。
+
+关于内容层面，Anthropic 给出的核心建议用一句话概括：\textbf{默认假设模型已经很聪明（“Claude is already very smart”）}。Agent 缺的是在你的项目中，怎么做才算正确。由此推导出一条实用的检验标准：每写完一段 Context，都值得回头问一句：\textbf{这段内容对得起它占用的 token 吗？}冗余的 tokens 会浪费宝贵的注意力预算。
+
+关于内容层面的另一个重要维度是\textbf{指令的精确度}。借用 Anthropic 提到的一个例子：不同任务的解决路径或者说 Agent Action Space 是不同的。可以将任务想象为两种地形：\textbf{窄桥和开阔地}。窄桥两侧是悬崖，容错空间极小，这类任务（如数据库迁移、发布流程）应当将步骤写死，甚至直接提供可执行脚本；开阔地上条条路通终点，只需给出方向和约束，具体路线交由模型判断（如 Code Review 这类高度依赖具体情境的任务）。换言之，\textbf{你给模型留多大的自由度，应当取决于任务本身的容错空间，而非你对模型的信任程度}。分析我自己的 Skills，确实自然分化成了这两类：\code{file-issues}、\code{submit-pr} 等偏向精确步骤，而 \code{db}、\code{web}、\code{core} 开发和自我分析的 \code{principle} 这几个 Skill 则偏向启发式约束。
+
+业界的最佳实践中还有两条建议偏向我所说的 Context 管理。\textbf{一致性}：同一个概念在全文中使用同一个术语，避免让模型去推测两种不同说法是否指向同一件事。\textbf{单一事实来源}：一个结论只在一个位置定义，其他位置通过引用指向它。
+
+\subsection{符合 Just-in-Time Context 的哲学}
+
+结构上的优化，可以对照 1.1 节的三层结构逐层分析。目标是让 Skill 的行为贴合 JIT 的设计哲学：\textbf{触发要精准}，Agent 需要时能可靠加载，不被无关请求误触发；\textbf{披露要渐进}，细节留在 reference files 中按需取用。做不到这两点，Skill 与一段冗长的 System Prompt 没有本质区别。
+
+\textbf{第一层 metadata：控制触发。}\code{description} 是整个 Skill 中影响范围最大的字段：它本质上充当文本分类器，是主 Agent 唯一用来判断是否需要加载的依据。编写它的过程就是在调节漏触发与误触发之间的平衡。Claude Code 团队对此有一个明确的定位：
+
+\begin{blockquote}
+description 不是摘要，是“什么时候该触发这个 Skill”的说明。写给模型看。
+\textit{“The description field is not a summary --- it's a description of when to trigger this skill. Write it for the model.”}
+\end{blockquote}
+
+实操上有四个要点：（1）写清功能和适用场景；（2）包含用户实际会使用的触发短语；（3）统一使用第三人称；（4）出现过度触发时添加负向条件（“Do NOT use for X”）。第三人称是因为 \code{description} 会与其他 Skills 的 metadata 一同注入 System Prompt，“我可以帮你”这类第一人称会造成叙述视角不一致，官方的观察是这会干扰模型对 Skill 的发现和匹配。调试也有便捷的方法：直接询问 Claude \textbf{你什么时候会使用这个 Skill？}，它会复述自己的理解，据此查漏补缺。
+
+\textbf{第二层 body：承载指令。}\code{SKILL.md} 的价值不在于面面俱到，而在于它同时充当\textbf{主流程}与\textbf{路由}：高频路径在正文中写清楚，进阶细节用一句话指向同目录下的独立文件（如“表单填写规范见 \code{forms.md}”），为渐进式披露预留入口。当正文逻辑开始分叉，或能力涵盖多个相对独立的子流程时，首先考虑的不是创建新的 Skill，而是将内容拆分为\textbf{主文件 + 多个 reference files}，我习惯把这些被引用的文件理解成 sub-skill。官方给出的参考线是 \code{SKILL.md} 正文控制在 500 行以内，接近上限时就该拆分。
+
+\textbf{第三层 \code{references/} / \code{scripts/}：支撑按需加载。}reference files 有三条经验。第一，引用只保持一层深度：\code{SKILL.md} $\to$ \code{forms.md} 没有问题，\code{SKILL.md} $\to$ \code{advanced.md} $\to$ \code{details.md} 则有风险，官方的观察是关键信息到第二跳之后容易丢失，模型往往只部分读取。第二，超过百行的 reference 文件，开头附一份目录。第三，多领域的 Skill 按领域拆分文件。\code{scripts/} 则只有一条核心原则：\textbf{代码的执行是确定的，自然语言的理解不是}，能在脚本中完成的逻辑，不应交回给模型去解释执行。
+
+\begin{notebox}[一份复杂的领域知识，应当组织为一个 Skill + 多层嵌套的 \code{references/}，还是拆分为多个独立 Skill？]
+前者结构简单、触发统一，但 \code{SKILL.md} 容易随时间/任务膨胀，逐渐退化为全量加载，甚至不得不多层嵌套；后者每个 Skill 小而精准，但会引入两个新问题：如何做最佳拆分、如何避免 \code{description} 定义有重叠。目前有些 Harness 支持 Plugin 的形式，但这个规范并未推广，所以我觉得这一问题还有待演进。
+\end{notebox}
+
+\subsection{Eval 是闭环的关键}
+
+为什么 Skill 需要测试？其实我觉得 Agent 时代，测试（Verify / Eval）比生成更重要。对于 Skills，我认为有两个原因：
+
+\begin{enumerate}
+  \item \textbf{防退步 / 性能 Regression}：3.2 节把更新 Skill 称作学习，学习就可能学错，改完一版到底变好还是变坏，需要一组固定的测试用例来回答，不能靠体感。通常情况下，大型系统都有多个维度的回归测试（regression test）来捕捉更新带来的潜在性能问题。
+  \item \textbf{能力追踪 / capability tracking}：模型每升级一次，都会有一些 Skill 从补充 Agent 能力变成阻碍 Agent，定期跑一遍用例，才知道哪些 Skills 可能不需要了（without skills 也能完成任务）。
+\end{enumerate}
+
+实操中值得关注的工作流是 \textbf{Claude A / Claude B 双实例}：A 负责设计 Skill，B 在干净的上下文中测试，避免自我确认偏差。
+
+\begin{center}
+  \includegraphics[width=0.92\linewidth]{assets/skill-creator-description-optimization.png}
+\end{center}
+
+上图展示了 skill-creator 优化 \code{description} 的实测效果。图中涵盖 5 类文档对应的 Skills，经过 \code{description} 调整后，在 held-out 测试集上均获得了触发准确度的提升。基于这个数据可以推导得到：\textbf{Skills 触发相关的问题是可 Eval、可优化的}。至于更具体的方法论（Eval 如何构建、测试集如何划分、跨模型测试与盲测 A/B 如何执行）属于进阶内容，为了不影响阅读流畅性，我这里也渐进式披露给大家：建议参阅 \weblink{https://claude.com/blog/complete-guide-to-building-skills-for-claude}{Complete Guide} 和 \weblink{https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills}{Improving Skill Creator}，或交给 skill-creator 代为生成和运行。
+
+\subsection{三个 Skills 的实践经验}
+
+前面的章节构建了最佳实践。我们通过对几个真实 Skills 实践的分析来加深理解。
+
+\textbf{案例一：frontend-design，一份只有内容的 Skill。}
+
+\weblink{https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md}{frontend-design} 或许是目前关注度最高的官方 Skill：它是 anthropics/skills 仓库（写作时约 149k stars）的代表性示例，Anthropic 为其撰写过\weblink{https://claude.com/blog/improving-frontend-design-through-skills}{专题分析}，也已收录于 Claude Code 官方插件市场。它没有 \code{references/} 和 \code{scripts/}，整个 Skill 仅由一份 55 行、约 1300 词的 \code{SKILL.md} 构成。对照 4.1 节的标准来看：
+
+\begin{itemize}
+  \item \textbf{只写模型默认会做错的部分。}全文不教任何 CSS 语法（这属于模型已具备的能力），它真正处理的是审美收敛问题：开篇即指出当前 AI 生成的设计集中在三种模式上，并明确表示这三种仅是默认输出，不构成真正的设计选择。
+  \item \textbf{开阔地任务，约束思考顺序而非执行路线。}全文唯一的流程要求是两遍式：先出方案，对照 brief 自查一轮，确认没有落入常见的 AI 模式后再写代码。
+\end{itemize}
+
+这份 Skill 自身的演化过程同样值得关注。写作期间（2026 年 6 月初）它刚经历一次重写：上一版不足 600 词，依赖一份具体的排除清单（不要 Inter 字体、不要紫色渐变，“不要每次都收敛到 Space Grotesk”）；新版将这些逐项排除全部删去，替换为上述三种默认模式的归纳，外加那道自查程序。基于 4.1 节的内容，Anthropic 也将该 Skill 从逐项纠错升级为可迁移启发式版本。
+
+\textbf{案例二：react-best-practices，大量规则怎么装。}
+
+\weblink{https://github.com/vercel-labs/agent-skills/blob/main/skills/react-best-practices/SKILL.md}{react-best-practices} 是 Vercel 官方的 React / Next.js 性能优化 Skill（\code{vercel-labs/agent-skills}，写作时约 27.8k stars），2.3 节提到我自己 Review 前端代码时一直启用它。它面临的难题与案例一恰好相反：70 条规则、8 个类别，若全部写入正文，Skill 就退化为一段冗长的 Prompt。Vercel 的方案是将三层结构充分利用：\code{SKILL.md} 仅作不到 150 行的索引，包含三项内容：适用场景、按影响力排序的类别表（请求瀑布和包体积居首，标为 CRITICAL）、每条规则的一行摘要；70 个规则文件放在 \code{rules/} 下，全部一层深，前缀即类别（\code{async-}、\code{bundle-}……），模型按需读取。（另附一份将全部规则展开的 \code{AGENTS.md}，应是为不支持按需读取的环境准备的）
+
+Vercel 的 Skills 实践中有两个设计值得借鉴。第一，\textbf{排序本身就是信息}：注意力预算有限，类别表将优先阅读什么直接编码进了结构。第二，\textbf{一行摘要往往已经足够}，比如“互不依赖的异步请求用 \code{Promise.all()} 并发”，模型读到这一句就知道该怎么做；只有需要看具体代码示例时，才有必要打开完整的规则文件。换句话说，\textbf{索引本身已经传递了大部分有用的信息}。这也许是我在 4.2 节结尾那个开放问题的一个真实解决方案：一个 Skill + 一组 \code{references/}，通过目录与优先级管控规则的膨胀。
+
+\textbf{案例三：我自己的实践。}
+
+上面两个都是别人的 Skill，最后留两个我自己的：一个偏个人管理（周记与 Personal Context 的沉淀），一个偏工程协作（30 万行代码库上的 Skills + Hooks）。
+
+我的 Personal Context 用的是 \textbf{iCloud \& Git + Obsidian + 语音输入法 + HAPI}。iCloud 用于同步，Obsidian 用于跨平台阅读和更新，语音输入法用于随时更新周记，HAPI 则用于在手机上远程控制我的 Mac mini，从而在移动场景下也能处理 Personal Context（使用 Codex 或 Claude Code）。
+
+我的 Personal Context 包括 \code{PERSONAL.md}（描述我自己的核心信息）、周记、项目记录（开源/小玩具）、博客资料（seed 文件、待读和已读文章）、投资记录（持仓、交易记录）、健身计划与记录。我分别把它们固化到不同的 \code{references/} 或 Skills 中。例如我有一个 Codex Automation 会每周日晚上 22:00 做自我分析，由于我反复读过《原则》这本书，因此得名 \code{Principle}。
+
+之前靠我自己手写 Prompt，很麻烦，很多流程也本该固定下来。因此我反复在不同 Session 里调试，优化这个个人 Skill。目前它会自动读取 \code{PERSONAL.md}、最近两周的周记（其中可能引用投资和健身记录），并使用 GitHub / 本地文件扫描检查我的 Git 提交记录，帮助我\textbf{恢复记忆}。最后，它会基于这些记录和一些零碎思考，生成下周周记的初始版本和提醒。之后我会尝试融入更多数据（睡眠、屏幕使用时间等），因此 \code{Principle} Skill 本质上更像一个固定流程。我还有一个金融分析 Skill 和一个 Codex Automation，负责每天基于持仓推荐一些阅读内容；其中也包含一些 \code{scripts/}，用于持仓可视化和更新。它离 Agent Trading 还很远，但已经是一个可复用的起点。
+
+最后是偏 Harness Engineering 的 Skills，我在前文也提到过。我所有的任务都有 GitHub Issue 做 tracking，每个项目都有 \code{contexts/} 文件夹。我的 Skill 中包括很多内容，我简单举几个例子：
+
+\begin{itemize}
+  \item \code{issue} sub-skill，用于基于 Session 和我的需求提交符合要求的 issue。这里“符合要求”指的是：一个全新 Session 中的 Agent 能够基于 issue body 和项目文件夹独立完成任务，并完成必要的 verify。它的重点是定义完成任务所需的 verify checklist。如前文所说，我会要求 Subagent 使用最佳实践类 Skill 做 Verify（同时也会设计 unit / integration / smoke tests），该 sub-skill 依赖对应的 Template。我也会使用 Hook 来监督 GitHub Issue 的创建是否符合要求。
+  \item \code{context} sub-skill，会检查新增的 Context 具体应该放到什么位置，同时检查它是否冗余、是否符合单一事实来源，并指导 Agent 做必要的 Context update / refactor。同时我也配备了每日 Automation，基于最近的提交使用该 sub-skill 检查项目上下文是否\textbf{健康}。
+\end{itemize}
+
+总之，优秀的 Skills 对于提升效率非常有帮助。我个人的风格一直是先尝试，拿到真实体验之后再帮助自己思考。

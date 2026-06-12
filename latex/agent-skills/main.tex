@@ -1,0 +1,30 @@
+% Agent Skills，一篇就够了。— PDF 导出
+% 编译（在本目录下）：./build.sh
+% 或手动：TEXINPUTS=..: xelatex main.tex （跑两遍）
+\documentclass{onepoem}
+
+\opheaderimg{../../docs/one-poem-suffices/agent-skills/assets/Agent-Skills-Header.png}
+\graphicspath{{../../docs/one-poem-suffices/agent-skills/}{../../docs/one-poem-suffices/context-engineering/}}
+
+\optitle{Agent Skills，一篇就够了。}
+\opsubtitle{Composable Procedural Knowledge for Agents\\[3pt]Skills 本质是 Context，取用方式是 Just-in-Time.}
+\opdate{2026.06}
+\opread{50 MIN}
+
+\begin{document}
+
+\makecover
+
+\tableofcontents
+\newpage
+
+\input{sections/00-intro}
+\input{sections/01-what}
+\input{sections/02-vs}
+\input{sections/03-why}
+\input{sections/04-how}
+\input{sections/05-end}
+\input{sections/06-references}
+\input{sections/07-appendix}
+
+\end{document}
