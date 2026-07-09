@@ -4,7 +4,7 @@
 
 我有一个做金融数据的 monorepo，代码和上下文大概几十万行的样子（monorepo 是所有的代码/上下文在一个 repo 中）。我问了 Codex 一个问题，大意是：`结合 repo，SEC 13F（机构持仓报告）这个数据 Pipeline，从原始数据源，到预处理到数据库再到 MCP 和 Web，整体链路是什么样`。只是问了这一个问题，订阅版 Codex 给 GPT-5.5 的 256k 上下文窗口就已经接近满，而且中途已经**自动压缩**过一次。这时候再问任何一个 follow-up，它都要先再压缩一次才能继续，且压缩后很多信息需要重读。
 
-<img src="./assets/harness-structures-overview.svg" alt="全文概览：同一个问题、同一个模型，单一线性 context 触顶自动压缩；探索隔离进子 agent 后主线平走" style="width:100%;max-width:900px;" />
+<img src="./assets/harness-structures-overview.svg" alt="全文概览：同一个问题、同一个模型，单一线性 context 触顶自动压缩；探索隔离进子 agent 后主线平走" style="width:100%;max-width:900px;display:block;margin:0 auto;" />
 
 同样的问题在 Claude Code 中则没有这个现象。**这是模型的差异，还是 harness 的差异？**一部分原因是 Claude 的上下文窗口本身更大（1M），但后面会看到，用同一个 GPT-5.5 换一种 harness 结构，自动压缩就消失了。**更主要的原因在 harness 怎么安排工具调用和 subagent（上下文工程）**。
 
@@ -14,7 +14,7 @@
 
 2. 再拜读两个工具的源码，来理解 harness 的具体行为（Codex 是开源的 [openai/codex](https://github.com/openai/codex)；Claude Code 没有官方源码仓库，用的是社区镜像 codeaashu/claude-code，npm 包 sourcemap 泄露的过时版本，所以引用的细节凡[官方文档](https://code.claude.com/docs/en/tools-reference)有的都以文档为准）。
 
-结论先行：基于运行记录的分析，我做了两个小实验，都只改 `AGENTS.md`（Codex 每次会话都会读的项目指令文件，相当于 Claude Code 的 CLAUDE.md）。第一个实验优化 Codex 的工具调用偏好，成本从 $3.93 降到 $2.73，省了 30%；第二个实验授权 Codex 把探索任务委派给 subagent（派不派由它按任务复杂度自己判断），成本比 baseline 高 35%（$5.30），但主上下文的窗口占用峰值从 241k 降为 93k，全程无需压缩。
+结论先行：基于运行记录的分析，我做了两个小实验，都只改 `AGENTS.md`（Codex 每次会话都会读的项目指令文件，相当于 Claude Code 的 CLAUDE.md）。第一个实验优化 Codex 的工具调用偏好，成本从 \$3.93 降到 \$2.73，省了 30%；第二个实验授权 Codex 把探索任务委派给 subagent（派不派由它按任务复杂度自己判断），成本比 baseline 高 35%（\$5.30），但主上下文的窗口占用峰值从 241k 降为 93k，全程无需压缩。
 
 !!! note "什么是 Harness"
     本文说的 harness 指模型外面那层运行时：上下文怎么组装、工具怎么定义、输出怎么截断、子 agent 怎么派遣、什么时候压缩，都是 harness 层的决定。Claude Code 和 Codex CLI 是两个 harness；GPT-5.5 和 Opus 4.8 是跑在里面的模型。同一个模型放进不同的 harness，行为/性能可以相差甚远。
@@ -27,7 +27,7 @@
 
 Baseline 的具体工具调用记录里很明显有一串的 `rg -n`。Codex 使用 `rg -n` 时的 pattern 写得很泛，大概长这样：
 
-<img src="./assets/baseline-rg-pattern.png" alt="baseline 里典型的过泛 pattern rg -n 搜索" style="zoom:25%;" />
+<img src="./assets/baseline-rg-pattern.png" alt="baseline 里典型的过泛 pattern rg -n 搜索" style="zoom:25%;display:block;margin:0 auto;" />
 
 !!! note "rg 速览：`-n`、`-l` 和 `--files` 的区别"
     `rg`（[ripgrep](https://github.com/BurntSushi/ripgrep)）是一个命令行搜索工具，和传统的 `grep` 干同一件事：按 pattern（正则表达式）在一堆文件里找出匹配的行。它比 grep 快很多，而且默认跳过 `.gitignore` 里的文件，所以成了 coding agent 在代码库里搜索的首选。Codex 的模型 prompt 里就明确写着 *"prefer using `rg` ... because `rg` is much faster than alternatives like `grep`"*（[`base_instructions`](https://github.com/openai/codex/blob/cca16a10878202cb2f6e9666b6b4330329ea7e65/codex-rs/models-manager/models.json#L56)，各代模型的 prompt 里都有这句）。
@@ -42,7 +42,7 @@ Baseline 的具体工具调用记录里很明显有一串的 `rg -n`。Codex 使
 
 你能发现 Codex 的搜索中大小写、别名、缩写全部串在一个 pattern 里，想一次搜完。这类搜索的原始返回动辄几万到二十几万 token，而 trajectory 显示，它们全部被截到 1 万 token 上下：最大的一次原始返回 **254k token**，到模型手里只剩 10k。最密集的五次过泛的搜索，原始返回量 vs 模型实际可见量对比如下：
 
-<img src="./assets/search-tokens-vs-visible-tokens.png" alt="五次过泛的搜索：原始返回量 vs 模型实际可见量" style="zoom:30%;" />
+<img src="./assets/search-tokens-vs-visible-tokens.png" alt="五次过泛的搜索：原始返回量 vs 模型实际可见量" style="zoom:30%;display:block;margin:0 auto;" />
 
 我在分析的时候对 Codex 的截断产生了兴趣，因此调研了下源码，有两层相关的处理：
 
@@ -67,7 +67,7 @@ Codex 的截断也做了 harness 优化，开头一行 *"Warning: truncated outp
 
 其实这个思路，在之前 Claude 做它实验性的 [Context Editing Tools](https://platform.claude.com/docs/en/build-with-claude/context-editing) 时有过体现，我在另一篇[《JIT Context，一篇就够了》](../../one-poem-suffices/just-in-time-context/#31-compress)里解释过，但**回收上下文窗口的代价是提示词缓存失效，这个 tradeoff 比较困难**，因此我较少看见 Context editing 的实际应用。
 
-<img src="./assets/truncation-lossy-vs-recoverable.svg" alt="同一次超长输出的两种截断：Codex 留头留尾丢中间、不留副本；Claude Code 留尾部并把完整副本落盘，随时可回捞" style="width:100%;max-width:880px;" />
+<img src="./assets/truncation-lossy-vs-recoverable.svg" alt="同一次超长输出的两种截断：Codex 留头留尾丢中间、不留副本；Claude Code 留尾部并把完整副本落盘，随时可回捞" style="width:100%;max-width:880px;display:block;margin:0 auto;" />
 
 到这里，Codex 在我这个任务上反复自动压缩的表层原因就找到了：**搜索内容过于宽泛，不对输出做剪枝，且被截断的内容实际上是丢失的**。前两件看起来都能用指令优化。把它们改掉，问题是不是就解决了？
 
@@ -88,7 +88,7 @@ Codex 的截断也做了 harness 优化，开头一行 *"Warning: truncated outp
 
 ![同一个任务，四条主 context 曲线](./assets/four-main-context-curves.png)
 
-简单优化后，Codex 主线程的工具调用从 132 次降到 64 次，连环截断基本消失，成本从 **$3.93 降到 $2.73**，省了 30%。
+简单优化后，Codex 主线程的工具调用从 132 次降到 64 次，连环截断基本消失，成本从 **\$3.93 降到 \$2.73**，省了 30%。
 
 把四次实验的工具调用统计出来（Claude 侧的统计含子 agent 内的调用），可以看到：
 
@@ -128,7 +128,7 @@ Claude 还有一个习惯：用 `| head` 给搜索输出设上限。Sonnet 和 O
 
 我去看了 Explore Agent 在源码里的实现（镜像源码 [`src/tools/AgentTool/built-in/exploreAgent.ts`](https://github.com/codeaashu/claude-code/blob/main/src/tools/AgentTool/built-in/exploreAgent.ts)），发现 Claude Code 针对 Explore 等信息探索类任务做了一套完整的特化设计。一图胜千言：
 
-<img src="./assets/explore-agent-design.svg" alt="Claude Code Explore 子 agent 的特化设计：只读 prompt、工具白名单、默认 haiku、omitClaudeMd；中间输出留在子 agent，只回结论摘要" style="width:100%;max-width:880px;" />
+<img src="./assets/explore-agent-design.svg" alt="Claude Code Explore 子 agent 的特化设计：只读 prompt、工具白名单、默认 haiku、omitClaudeMd；中间输出留在子 agent，只回结论摘要" style="width:100%;max-width:880px;display:block;margin:0 auto;" />
 
 具体来说，Claude Code 为 Explore Agent 做了如下设计：
 
@@ -163,9 +163,11 @@ Codex 也有 `explorer` 这个 role，但它的内置定义文件 [`explorer.tom
 
 Codex 里也写了一段主动委派的指令，放在另一个文件里（[`multi_agent_mode_instructions.rs`](https://github.com/openai/codex/blob/main/codex-rs/core/src/context/multi_agent_mode_instructions.rs)）：*"Use sub-agents when parallel work would materially improve speed or quality"*，在并行能明显提升速度或质量时主动用子 agent。这一档叫 Proactive，但默认配置下不会生效。
 
-> 我基于源码查了一下 Proactive 的生效条件。目前没办法生效，有两个前置条件（[`session/multi_agents.rs`](https://github.com/openai/codex/blob/main/codex-rs/core/src/session/multi_agents.rs)）。第一个是 feature 开关：Proactive 的判定只在 multi-agent v2 下运行，而 `multi_agent_v2` 在 feature 表里标着 `UnderDevelopment`（注释 "not ready for external use"）、默认关闭。第二个是推理档位：Proactive 不是配置项，是从 reasoning effort 派生的，开到 `ultra` 才会切过去。所以主动委派目前对应的是一个还没发布的档位。应该只有内部员工可以享受（可以 ultra + 1M 上下文真爽啊）
->
-> 关于 Codex harness 的 subagent 设计，我没想通。Codex 的订阅用户窗口只有 256k，相较于其他的主流 Harness 是**更需要靠子 agent 隔离上下文**，但它默认不派子 agent，主动委派的功能也还在内部开发中。可能是担心 subagent 会让新手的 token 消耗失控，也可能是多 agent 路径还没打磨到能默认打开？（从后文我做实验来看，Codex 的 subagent orchestration 也有一些让我意外的行为）。
+!!! ambition "Proactive 模式的生效条件"
+
+    我基于源码查了一下 Proactive 的生效条件。目前没办法生效，有两个前置条件（[`session/multi_agents.rs`](https://github.com/openai/codex/blob/main/codex-rs/core/src/session/multi_agents.rs)）。第一个是 feature 开关：Proactive 的判定只在 multi-agent v2 下运行，而 `multi_agent_v2` 在 feature 表里标着 `UnderDevelopment`（注释 "not ready for external use"）、默认关闭。第二个是推理档位：Proactive 不是配置项，是从 reasoning effort 派生的，开到 `ultra` 才会切过去。所以主动委派目前对应的是一个还没发布的档位。应该只有内部员工可以享受（可以 ultra + 1M 上下文真爽啊）
+
+    关于 Codex harness 的 subagent 设计，我没想通。Codex 的订阅用户窗口只有 256k，相较于其他的主流 Harness 是**更需要靠子 agent 隔离上下文**，但它默认不派子 agent，主动委派的功能也还在内部开发中。可能是担心 subagent 会让新手的 token 消耗失控，也可能是多 agent 路径还没打磨到能默认打开？（从后文我做实验来看，Codex 的 subagent orchestration 也有一些让我意外的行为）。
 
 所以，当下开启 Codex 主动 subagent 的办法是在 `AGENTS.md` 里显式授权。不过实际操作时遇到了两个问题：
 
@@ -183,7 +185,7 @@ Codex 里也写了一段主动委派的指令，放在另一个文件里（[`mul
 
 > "子任务已经在后台跑。我先在主线程做轻量索引和关键疑点确认，避免等结果时空转；只会读少数命中文件的相关行段。"
 
-<img src="./assets/spawn-wait-vs-busywait.svg" alt="派出 explorer 后的两种主线程行为：等待并只做综合，主 context 平走；一边等一边自己探索，探索输出同时进了主 context" style="width:100%;max-width:880px;" />
+<img src="./assets/spawn-wait-vs-busywait.svg" alt="派出 explorer 后的两种主线程行为：等待并只做综合，主 context 平走；一边等一边自己探索，探索输出同时进了主 context" style="width:100%;max-width:880px;display:block;margin:0 auto;" />
 
 这个行为和隔离的目的是冲突的。**派子 agent 是为了让主 context 干净，但主 agent 一边等子 agent，一边自己在主窗口里读文件，上下文隔离就白做了**。源码里能看到这个倾向的来源。`wait_agent` 的设计允许主 agent 设一个超时时间，到时间子 agent 没做完也不报错，直接返回当前进度。再加上工具描述里"避免空等"的引导，模型自然倾向于在等待期间继续做探索。在追求速度的场景这也许是对的，但我用子 agent 是为了隔离上下文，不是为了快。我的做法是在指令里写明：**子 agent 运行期间，主线程只做综合，不做探索**。
 
@@ -214,14 +216,14 @@ Codex 里也写了一段主动委派的指令，放在另一个文件里（[`mul
 
 | harness 结构 | 实验 | 主 ctx 峰值 | 压缩 | 成本 |
 |---|---|---|---|---|
-| 单一线性 context | GPT-5.5 Baseline / Refined | 231k / 241k | 是 @60 / 是 @64 | $3.93 / $2.73 |
-| 子 agent 隔离 | **GPT-5.5 Delegate** / Sonnet 5 / Opus 4.8 | 93k / 102k / 60k | 否 / 否 / 否 | $5.30 / $4.77 / $5.40 |
+| 单一线性 context | GPT-5.5 Baseline / Refined | 231k / 241k | 是 @60 / 是 @64 | \$3.93 / \$2.73 |
+| 子 agent 隔离 | **GPT-5.5 Delegate** / Sonnet 5 / Opus 4.8 | 93k / 102k / 60k | 否 / 否 / 否 | \$5.30 / \$4.77 / \$5.40 |
 
 **分组的边界是 harness 结构，GPT-5.5 横跨两组。**开头的问题到这里有了答案。模型之间当然有差异：1.2 的统计表可以看到，Claude 天然写更窄的 pattern、更多用 `| head` 剪枝，这些习惯确实帮它省 context。但"总在压缩"这个现象似乎更多是 harness 设计导致的：同一个 GPT-5.5，换了 harness 设计其表现和 Claude 的两个模型基本一致。
 
 子 agent 分工没有改变 GPT-5.5 的工具使用习惯：分析 explorer 的子轨迹，还是用 `nl` 读整文件、搜索 pattern 还是很宽泛。改变的只是任务的编排与上下文工程。
 
-代价是更高的成本。从 $2.73 涨到 $5.30，几乎翻倍，和 Claude 两次实验（$4.77~$5.40）在同一水平。原因在之前的博客中提到过，多智能体的 token 消耗接近 chat 的 15 倍。但由于并行的设计，耗时反而更短：delegate 用了 5.9 分钟，refined 是 7.3 分钟。
+代价是更高的成本。从 \$2.73 涨到 \$5.30，几乎翻倍，和 Claude 两次实验（\$4.77~\$5.40）在同一水平。原因在之前的博客中提到过，多智能体的 token 消耗接近 chat 的 15 倍。但由于并行的设计，耗时反而更短：delegate 用了 5.9 分钟，refined 是 7.3 分钟。
 
 本次实验十分粗糙，每个 setting 只跑了一次。且还有一个 setting 没做测试：hardcode 的搜索规则和多智能体委派同时存在，它或许能让委派更便宜一些，就留给感兴趣的读者了～ 
 
