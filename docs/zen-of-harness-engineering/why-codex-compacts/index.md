@@ -1,3 +1,5 @@
+![zen-of-harness-engineering](./assets/zen-of-harness-engineering.png)
+
 # 为什么 Codex 总在自动压缩？
 
 `READ⏰: 18min`
