@@ -32,6 +32,7 @@ nav = [
         { "引子与问题划分" = "zen-of-harness-engineering/intro/index.md" },
         { "最佳实践 I" = "zen-of-harness-engineering/best-practice-1/index.md" },
         { "Claude Code 源码蒸馏" = "zen-of-harness-engineering/claudecode-distillation-practice/index.md" },
+        { "为什么 Codex 总在自动压缩" = "zen-of-harness-engineering/why-codex-compacts/index.md" },
     ]},
     { "Scaling 一下" = [
         { "index" = "scaling-thoughts/index.md" },
