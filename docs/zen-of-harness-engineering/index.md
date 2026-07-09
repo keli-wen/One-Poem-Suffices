@@ -36,3 +36,13 @@ hide:
 从 51.2 万行 Claude Code 源码中蒸馏设计模式的完整实践记录：多 Agent 协作架构（Codex 审查 + Claude 执行）、品味注入的 PCA 类比、以及 7 轮 review 收敛的过程复盘。
 
 :octicons-clock-24: 25 min &nbsp; [:octicons-arrow-right-24: 阅读全文](./claudecode-distillation-practice/)
+
+---
+
+### :material-magnify: [为什么 Codex 总在自动压缩？](./why-codex-compacts/)
+
+> *"同一个模型放进不同的 harness，行为/性能可以相差甚远。"*
+
+同一个问题、同一个 GPT-5.5，Codex 反复触发自动压缩，Claude Code 全程平走。从 trajectory 和源码两个角度拆解原因：过泛的搜索与截断、渐进式披露 vs 事后止损、以及子 agent 隔离如何让主 context 峰值从 241k 降到 93k。
+
+:octicons-clock-24: 18 min &nbsp; [:octicons-arrow-right-24: 阅读全文](./why-codex-compacts/)
