@@ -1,0 +1,65 @@
+<svg viewBox="0 0 940 432" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t">
+  <title id="t">同一次超长输出的两种截断：Codex 留头留尾丢中间、不留副本，想再看只能重跑；Claude Code 留尾部并把完整副本落盘，之后随时 Read/grep 回捞</title>
+  <style>
+    .zh  { font-family: "PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif; }
+    .mono{ font-family: ui-monospace,"SF Mono",Menlo,Consolas,monospace; }
+  </style>
+  <defs>
+    <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="13" cy="13" r="1" fill="#2B2722" opacity="0.045"/>
+    </pattern>
+    <marker id="ah-ink" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6B655C"/>
+    </marker>
+    <marker id="ah-coral" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#D97757"/>
+    </marker>
+  </defs>
+
+  <rect width="940" height="432" fill="#FFFFFF"/>
+  <rect width="940" height="432" fill="url(#dots)"/>
+
+  <!-- ─── Codex：丢中间，不留副本 ─── -->
+  <text class="zh" x="40" y="60" font-size="13.5" font-weight="600" fill="#2B2722">Codex · 单条 exec 输出</text>
+  <text class="zh" x="900" y="60" font-size="13.5" font-weight="600" fill="#C0453A" text-anchor="end">丢中间，不留副本</text>
+
+  <rect x="40" y="78" width="290" height="32" rx="7" fill="#EAE4DB" stroke="#D8D2C9" stroke-width="1"/>
+  <text class="zh" x="52" y="98" font-size="11" fill="#6B655C">原始输出 ≈254k token</text>
+
+  <line x1="338" y1="94" x2="394" y2="94" stroke="#6B655C" stroke-width="1.4" marker-end="url(#ah-ink)"/>
+  <text class="zh" x="366" y="82" font-size="10.5" fill="#9B948A" text-anchor="middle">截断</text>
+
+  <rect x="404" y="78" width="36" height="32" rx="5" fill="#6B655C"/>
+  <rect x="444" y="78" width="300" height="32" rx="5" fill="#FFFFFF" stroke="#C0453A" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <text class="zh" x="594" y="98" font-size="11" fill="#C0453A" text-anchor="middle">中间 ~244k 直接消失</text>
+  <rect x="748" y="78" width="36" height="32" rx="5" fill="#6B655C"/>
+  <text class="zh" x="404" y="130" font-size="10.5" fill="#9B948A">模型只拿到头和尾；想再看，只能重跑更窄的命令</text>
+
+  <!-- ─── Claude Code：截断但落盘 ─── -->
+  <text class="zh" x="40" y="196" font-size="13.5" font-weight="600" fill="#2B2722">Claude Code · 单条 Bash 输出</text>
+  <text class="zh" x="900" y="196" font-size="13.5" font-weight="600" fill="#2F8F6B" text-anchor="end">截断，但完整副本落盘</text>
+
+  <rect x="40" y="214" width="290" height="32" rx="7" fill="#EAE4DB" stroke="#D8D2C9" stroke-width="1"/>
+  <text class="zh" x="52" y="234" font-size="11" fill="#6B655C">原始输出 &gt;30k 字符</text>
+
+  <line x1="338" y1="230" x2="394" y2="230" stroke="#6B655C" stroke-width="1.4" marker-end="url(#ah-ink)"/>
+  <text class="zh" x="366" y="218" font-size="10.5" fill="#9B948A" text-anchor="middle">截断</text>
+
+  <rect x="404" y="214" width="56" height="32" rx="5" fill="#6B655C"/>
+  <text class="zh" x="432" y="234" font-size="10" fill="#FFFFFF" text-anchor="middle">尾部</text>
+  <rect x="468" y="214" width="316" height="32" rx="7" fill="#FFFFFF" stroke="#2B2722" stroke-width="1.2"/>
+  <text class="mono" x="626" y="234" font-size="10.5" fill="#2B2722" text-anchor="middle">Full output saved to: &lt;path&gt;</text>
+
+  <!-- 落盘的完整副本 -->
+  <line x1="626" y1="246" x2="626" y2="270" stroke="#6B655C" stroke-width="1.2" marker-end="url(#ah-ink)"/>
+  <rect x="530" y="274" width="200" height="58" rx="9" fill="#FFFFFF" stroke="#D97757" stroke-width="1.3"/>
+  <text class="zh" x="546" y="296" font-size="11" fill="#B85C39">完整副本 · session 文件</text>
+  <line x1="546" y1="312" x2="666" y2="312" stroke="#E4DFD8" stroke-width="5" stroke-linecap="round"/>
+  <line x1="546" y1="322" x2="628" y2="322" stroke="#E4DFD8" stroke-width="5" stroke-linecap="round"/>
+
+  <path d="M 526 303 C 448 303, 428 268, 428 250" fill="none" stroke="#D97757" stroke-width="1.4" marker-end="url(#ah-coral)"/>
+  <text class="zh" x="368" y="308" font-size="10.5" fill="#B85C39" text-anchor="end">之后随时 Read / grep 回捞</text>
+
+  <!-- ─── 图注 ─── -->
+  <text class="zh" x="470" y="410" font-size="12.5" fill="#6B655C" text-anchor="middle">同样是截断：一边截掉就没了，一边留了一条找回去的路</text>
+</svg>

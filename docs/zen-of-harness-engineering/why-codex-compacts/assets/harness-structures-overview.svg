@@ -1,0 +1,100 @@
+<svg viewBox="0 0 940 510" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t">
+  <title id="t">全文概览：同一个任务的三步实验。Baseline 触顶压缩；教它省着搜之后还是触顶，只是晚了点；把探索隔离进子 agent 后主线平走，不再触顶</title>
+  <style>
+    .zh  { font-family: "PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif; }
+    .mono{ font-family: ui-monospace,"SF Mono",Menlo,Consolas,monospace; }
+  </style>
+  <defs>
+    <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="13" cy="13" r="1" fill="#2B2722" opacity="0.045"/>
+    </pattern>
+    <marker id="ah-coral" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#D97757"/>
+    </marker>
+  </defs>
+
+  <rect width="940" height="510" fill="#FFFFFF"/>
+  <rect width="940" height="510" fill="url(#dots)"/>
+
+  <!-- ─── 头部 ─── -->
+  <text class="zh" x="40" y="52" font-size="16" font-weight="600" fill="#2B2722">同一个任务，三种配置</text>
+  <text class="mono" x="40" y="74" font-size="11" fill="#9B948A">GPT-5.5 xhigh · Codex CLI · 每次只改 AGENTS.md</text>
+
+  <!-- ─── ① Baseline ─── -->
+  <circle cx="48" cy="128" r="11" fill="#FFFFFF" stroke="#2B2722" stroke-width="1.3"/>
+  <text class="mono" x="48" y="132.5" font-size="11.5" fill="#2B2722" text-anchor="middle">1</text>
+  <text class="zh" x="76" y="99" font-size="13" font-weight="600" fill="#2B2722">Baseline · 纯默认</text>
+  <rect x="76" y="110" width="560" height="36" rx="8" fill="#FFFFFF" stroke="#2B2722" stroke-width="1.3"/>
+  <rect x="82"  y="116" width="44" height="24" rx="3.5" fill="#EAE4DB"/>
+  <rect x="130" y="116" width="26" height="24" rx="3.5" fill="#E9C9BC"/>
+  <rect x="160" y="116" width="54" height="24" rx="3.5" fill="#EAE4DB"/>
+  <rect x="218" y="116" width="20" height="24" rx="3.5" fill="#DFD8CD"/>
+  <rect x="242" y="116" width="60" height="24" rx="3.5" fill="#E9C9BC"/>
+  <rect x="306" y="116" width="32" height="24" rx="3.5" fill="#EAE4DB"/>
+  <rect x="342" y="116" width="50" height="24" rx="3.5" fill="#DFD8CD"/>
+  <rect x="396" y="116" width="22" height="24" rx="3.5" fill="#E9C9BC"/>
+  <rect x="422" y="116" width="42" height="24" rx="3.5" fill="#EAE4DB"/>
+  <rect x="468" y="116" width="28" height="24" rx="3.5" fill="#DFD8CD"/>
+  <rect x="500" y="116" width="36" height="24" rx="3.5" fill="#E9C9BC"/>
+  <rect x="540" y="116" width="42" height="24" rx="3.5" fill="#EAE4DB"/>
+  <line x1="580" y1="103" x2="580" y2="152" stroke="#C0453A" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text class="mono" x="580" y="99" font-size="9.5" fill="#C0453A" text-anchor="middle">90%</text>
+  <text class="zh" x="664" y="124" font-size="13.5" font-weight="600" fill="#C0453A">触顶，自动压缩</text>
+  <text class="zh" x="664" y="142" font-size="10.5" fill="#9B948A">压缩 @60 · $3.93</text>
+
+  <!-- ─── ② 优化 1 ─── -->
+  <circle cx="48" cy="268" r="11" fill="#FFFFFF" stroke="#2B2722" stroke-width="1.3"/>
+  <text class="mono" x="48" y="272.5" font-size="11.5" fill="#2B2722" text-anchor="middle">2</text>
+  <text class="zh" x="76" y="239" font-size="13" font-weight="600" fill="#2B2722">优化 1 · 教它省着搜</text>
+  <text class="mono" x="236" y="239" font-size="10.5" fill="#9B948A">加细节搜索规则</text>
+  <rect x="76" y="250" width="560" height="36" rx="8" fill="#FFFFFF" stroke="#2B2722" stroke-width="1.3"/>
+  <rect x="82"  y="256" width="36" height="24" rx="3.5" fill="#EFEAE2"/>
+  <rect x="160" y="256" width="22" height="24" rx="3.5" fill="#EAD6CC"/>
+  <rect x="224" y="256" width="46" height="24" rx="3.5" fill="#EFEAE2"/>
+  <rect x="312" y="256" width="28" height="24" rx="3.5" fill="#EAD6CC"/>
+  <rect x="382" y="256" width="40" height="24" rx="3.5" fill="#EFEAE2"/>
+  <rect x="464" y="256" width="24" height="24" rx="3.5" fill="#EAD6CC"/>
+  <rect x="530" y="256" width="44" height="24" rx="3.5" fill="#EFEAE2"/>
+  <line x1="580" y1="243" x2="580" y2="292" stroke="#C0453A" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text class="mono" x="580" y="239" font-size="9.5" fill="#C0453A" text-anchor="middle">90%</text>
+  <text class="zh" x="664" y="264" font-size="13.5" font-weight="600" fill="#B07A28">还是触顶，只是晚了点</text>
+  <text class="zh" x="664" y="282" font-size="10.5" fill="#9B948A">压缩 @64 · $2.73（省 30%）</text>
+
+  <!-- ─── ③ 优化 2 ─── -->
+  <circle cx="48" cy="408" r="11" fill="#FFFFFF" stroke="#2B2722" stroke-width="1.3"/>
+  <text class="mono" x="48" y="412.5" font-size="11.5" fill="#2B2722" text-anchor="middle">3</text>
+  <text class="zh" x="76" y="379" font-size="13" font-weight="600" fill="#2B2722">优化 2 · 把探索隔离进子 agent</text>
+  <text class="mono" x="312" y="379" font-size="10.5" fill="#9B948A">细节规则换成委派规则 · Claude Code 的默认结构</text>
+  <rect x="76" y="390" width="560" height="36" rx="8" fill="#FFFFFF" stroke="#2B2722" stroke-width="1.3"/>
+  <rect x="82"  y="396" width="28" height="24" rx="3.5" fill="#EAE4DB"/>
+  <rect x="114" y="396" width="14" height="24" rx="3.5" fill="#DFD8CD"/>
+  <rect x="138" y="396" width="11" height="24" rx="3" fill="#D97757"/>
+  <rect x="238" y="396" width="11" height="24" rx="3" fill="#D97757"/>
+  <rect x="338" y="396" width="11" height="24" rx="3" fill="#D97757"/>
+  <rect x="438" y="396" width="11" height="24" rx="3" fill="#D97757"/>
+  <line x1="580" y1="383" x2="580" y2="432" stroke="#D8D2C9" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text class="zh" x="664" y="404" font-size="13.5" font-weight="600" fill="#2F8F6B">主线平走，不再触顶</text>
+  <text class="zh" x="664" y="422" font-size="10.5" fill="#9B948A">峰值 93k · 0 压缩 · $5.30</text>
+
+  <!-- 草稿 context -->
+  <g stroke="#BDB6AB" stroke-width="1.2" stroke-dasharray="5 4" fill="#FFFFFF">
+    <rect x="116" y="446" width="56" height="44" rx="7"/>
+    <rect x="216" y="446" width="56" height="44" rx="7"/>
+    <rect x="316" y="446" width="56" height="44" rx="7"/>
+    <rect x="416" y="446" width="56" height="44" rx="7"/>
+  </g>
+  <g stroke="#E4DFD8" stroke-width="4.5" stroke-linecap="round">
+    <line x1="127" y1="461" x2="161" y2="461"/><line x1="127" y1="475" x2="151" y2="475"/>
+    <line x1="227" y1="461" x2="261" y2="461"/><line x1="227" y1="475" x2="251" y2="475"/>
+    <line x1="327" y1="461" x2="361" y2="461"/><line x1="327" y1="475" x2="351" y2="475"/>
+    <line x1="427" y1="461" x2="461" y2="461"/><line x1="427" y1="475" x2="451" y2="475"/>
+  </g>
+  <g stroke="#D97757" stroke-width="1.2" fill="none">
+    <line x1="144" y1="446" x2="144" y2="432" marker-end="url(#ah-coral)"/>
+    <line x1="244" y1="446" x2="244" y2="432" marker-end="url(#ah-coral)"/>
+    <line x1="344" y1="446" x2="344" y2="432" marker-end="url(#ah-coral)"/>
+    <line x1="444" y1="446" x2="444" y2="432" marker-end="url(#ah-coral)"/>
+  </g>
+  <text class="zh" x="492" y="472" font-size="10.5" fill="#9B948A">中间输出用完即弃，只回摘要</text>
+
+</svg>
