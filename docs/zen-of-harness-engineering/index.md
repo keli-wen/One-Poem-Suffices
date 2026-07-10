@@ -46,3 +46,13 @@ hide:
 同一个问题、同一个 GPT-5.5，Codex 反复触发自动压缩，Claude Code 全程平走。从 trajectory 和源码两个角度拆解原因：过泛的搜索与截断、渐进式披露 vs 事后止损、以及子 agent 隔离如何让主 context 峰值从 241k 降到 93k。
 
 :octicons-clock-24: 18 min &nbsp; [:octicons-arrow-right-24: 阅读全文](./why-codex-compacts/)
+
+---
+
+### :material-comment-question-outline: [如何看待 grill-me（拷问我）这个 Skill？](./why-grill-me/)
+
+> *"在 Agent 行动得越来越快时，人应该如何继续对方向负责。"*
+
+从一个轻量的追问 Skill 出发，讨论 Taste Injection、执行过程中的不确定性，以及 Shared Context Folder、Issue / PR 和设计追问组成的三层控制体系。
+
+:octicons-clock-24: 9 min &nbsp; [:octicons-arrow-right-24: 阅读全文](./why-grill-me/)
