@@ -8,16 +8,13 @@
 
 **Update 2023/11/06: 添加了通信量的可视化分析**
 
-- `author`: @whisper
-- `date`: 2023/10/25
-
 ![](./assets/zero-01.jpg)
 
-*Figure. ZeRO Framework*
+*ZeRO 框架总览*
 
 ![](./assets/zero-02.jpg)
 
-*Figure. ZeRO-DP Communication Analysis Visualization*
+*ZeRO-DP 通信量分析可视化*
 
 ### 1 Existing Problem
 
@@ -343,8 +340,6 @@ ReduceScatter 属于多对多的通信原语，它操作执行与 Reduce 操作�
 
 ![](./assets/zero-14.jpg)
 
-*allgather.png*
-
   
 
 AllGather，全收集。它属于多对多的通信原语，具有多个数据发送者，多个数据接收者，可以在集群内把多个节点的数据收集到一个主节点上（Gather），再把这个收集到的数据分发到其他节点上（broadcast），即收集集群内所有的数据到所有的节点上。
@@ -370,8 +365,6 @@ Reduce + Broadcast 的操作貌似很直观：
 
 ![](./assets/zero-16.jpg)
 
-*img*
-
 **（这里参考了知乎上某位博主的介绍，参考后问reference）高效实现一个集群通信的关键是如何充分利用设备和设备之间的带宽，基于环状（ring）通信实现的集群通信算法就是这一思想的体现。**
 
 我们可以理解为，Ring-ReduceScatter 每次都发送一部分自己的数据出去（不属于这个设备），由于自己最后只需要其中一份，那么只需要执行总数 - 1 次数据传递和接收（双工）。
@@ -387,8 +380,6 @@ Ring-ReduceScatter 执行结束之后，再通过 AllGather 过程就可以实�
   
 
 ![](./assets/zero-17.jpg)
-
-*img*
 
 如图所示，整个流程和 Ring-ReduceScatter 一致。
 
