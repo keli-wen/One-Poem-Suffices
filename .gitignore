@@ -1,5 +1,6 @@
 .DS_Store
 site/
 archived/
-scripts/
+scripts/*
+!scripts/build-redirects.py
 .claude/

@@ -1,3 +1,5 @@
+> **提示**：博客唯一正式地址为 **[https://lastwhisper.dev](https://lastwhisper.dev)**，文章请前往新站点阅读。本仓库仅作为文章的 markdown 源，欢迎在这里提 Issue / PR 指正错误；旧地址 keli-wen.github.io/One-Poem-Suffices 会自动跳转。
+
 # One Poem Suffices
 
 个人博客，分享关于 AI Agent / Context Engineering / AI Coding 的深度思考与实践。
